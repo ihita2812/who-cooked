@@ -12,36 +12,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.ihita.wholetthemcook.ui.theme.WhoLetThemCookTheme
+import com.ihita.wholetthemcook.navigation.WhoLetThemCookNavGraph
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            WhoLetThemCookTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "ihita",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+            WhoLetThemCookTheme() {
+                WhoLetThemCookNavGraph()
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    WhoLetThemCookTheme {
-        Greeting("ihita")
-    }
-}
+//@Composable
+//fun Greeting(name: String, modifier: Modifier = Modifier) {
+//    Text(
+//        text = "Hello $name!",
+//        modifier = modifier
+//    )
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun GreetingPreview() {
+//    WhoLetThemCookTheme {
+//        Greeting("ihita")
+//    }
+//}
