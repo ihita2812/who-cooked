@@ -13,3 +13,8 @@ Android app for the recipes of 401.
 
 ### navigation
 - go from `recipe-list` to `recipe-info` screen
+
+### `recipe-info` screen
+- edit recipe
+- bg: soft paper ish
+- CONVERT TO CHECK LIST ? I AM SO BIG BRAIN
