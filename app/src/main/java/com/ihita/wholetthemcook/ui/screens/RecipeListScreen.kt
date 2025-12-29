@@ -11,31 +11,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+
 import com.ihita.wholetthemcook.data.Recipe
+import com.ihita.wholetthemcook.viewmodel.RecipeListViewModel
 
 @Composable
-fun RecipeListScreen() {
-//    Box(
-//        modifier = Modifier.fillMaxSize(),
-//        contentAlignment = Alignment.Center
-//    ) {
-//        Text("Recipe List (coming soon!)")
-//    }
-
-    val dummyRecipes = listOf(
-        Recipe(1, "adiddy"),
-        Recipe(2, "nigesh"),
-        Recipe(3, "idli")
-    )
+fun RecipeListScreen(viewModel: RecipeListViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+    val recipes by viewModel.recipes.collectAsState()
 
     LazyColumn {
-        items(dummyRecipes) { recipe ->
+        items(recipes) { recipe ->
             Text(
                 text = recipe.title,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                modifier = Modifier.padding(16.dp)
             )
         }
     }
+
 }
