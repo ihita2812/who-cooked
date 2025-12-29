@@ -7,11 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+
+import com.ihita.wholetthemcook.navigation.*
 
 @Composable
-fun HomeScreen(
-    onNavigateToRecipeList: () -> Unit
-) {
+fun HomeScreen(navController: NavHostController) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -20,9 +21,10 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = "Welcome!", modifier = Modifier.padding(bottom = 24.dp))
-            Button(onClick = onNavigateToRecipeList) {
-                Text("Go to Recipe Page")
+            Button(onClick = { navController.navigate(Routes.RECIPE_LIST) }) {
+                Text("Go to recipes")
             }
+
         }
     }
 }

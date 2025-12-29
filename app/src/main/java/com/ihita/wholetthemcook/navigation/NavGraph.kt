@@ -15,25 +15,26 @@ fun WhoLetThemCookNavGraph() {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "home") {
-        composable("home") {
-            HomeScreen(
-                onNavigateToRecipeList = {
-                    navController.navigate("recipe_list")
-                }
-            )
+        composable(Routes.HOME) {
+            HomeScreen(navController)
         }
 
-        composable("recipe_list") {
+        composable(Routes.RECIPE_LIST) {
             RecipeListScreen(navController)
         }
 
-        composable(
-            route = "recipeInfo/{recipeId}",
-            arguments = listOf(navArgument("recipeId") { type = NavType.IntType })
-        ) {
-            val recipeId = it.arguments?.getInt("recipeId")!!
-            RecipeInfoScreen(recipeId)
-        }
+        composable(route = "${Routes.RECIPE_INFO}/{recipeId}") { backStackEntry ->
 
+            val recipeId = backStackEntry.arguments
+                ?.getString("recipeId")
+                ?.toInt() ?: return@composable
+
+            RecipeInfoScreen(
+                recipeId = recipeId,
+                onBackClick = { navController.popBackStack() },
+                onEditClick = { /* TODO */ },
+                onDeleteClick = { /* TODO */ }
+            )
+        }
     }
 }
