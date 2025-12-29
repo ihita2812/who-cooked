@@ -9,26 +9,67 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
+
 import com.ihita.wholetthemcook.viewmodel.RecipeInfoViewModel
 import com.ihita.wholetthemcook.viewmodel.RecipeInfoViewModelFactory
 
-
 @Composable
-fun RecipeInfoScreen(recipeId: Int) {
+fun RecipeInfoScreen(recipeId: Int, onBackClick: () -> Unit, onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
 
-    val viewModel: RecipeInfoViewModel = viewModel(
-        factory = RecipeInfoViewModelFactory(recipeId)
-    )
+        // Title
+        Text(text = "Recipe Title (ID: $recipeId)")
 
-    val recipe by viewModel.recipe.collectAsState()
+        Spacer(modifier = Modifier.height(12.dp))
 
-    recipe?.let {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = it.title, style = MaterialTheme.typography.headlineMedium)
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = it.process.toString())
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = it.notes.toString())
+        // Ingredients
+        Text(text = "Ingredients")
+        Spacer(modifier = Modifier.height(4.dp))
+
+        LazyColumn(
+            modifier = Modifier.weight(1f)
+        ) {
+            items(3) { index ->
+                Text(text = "• Ingredient $index – 2 cups")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Process
+        Text(text = "Process")
+        Text(text = "Step-by-step cooking process goes here.")
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Notes
+        Text(text = "Notes")
+        Text(text = "Optional notes go here.")
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Buttons
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(onClick = onBackClick) {
+                Text("Back")
+            }
+
+            Button(onClick = onEditClick) {
+                Text("Edit")
+            }
+
+            Button(onClick = onDeleteClick) {
+                Text("Delete")
+            }
         }
     }
 }
