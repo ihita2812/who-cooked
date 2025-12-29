@@ -11,12 +11,67 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
+import androidx.room.Room
+
+import kotlinx.coroutines.launch
+
 import com.ihita.wholetthemcook.ui.theme.WhoLetThemCookTheme
 import com.ihita.wholetthemcook.navigation.WhoLetThemCookNavGraph
+import com.ihita.wholetthemcook.data.Database
+import com.ihita.wholetthemcook.data.AppDatabase
+import com.ihita.wholetthemcook.data.RecipeDao
+import com.ihita.wholetthemcook.data.Recipe
 
 class MainActivity : ComponentActivity() {
+//    private lateinit var db: AppDatabase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+//        // -----------------DB TESTING-----------------
+//        // without lifecycle scope
+//        // --------------------------------------------
+//        db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "who-cooked-db").build()
+//        val recipeDao = db.recipeDao()
+//        val ingredientDao = db.ingredientDao()
+//        val ingredientSetDao = db.ingredientSetDao()
+//        // -----------------DB TESTING-----------------
+
+        Database.init(applicationContext)
+
+//        // -----------------DB TESTING-----------------
+//        // without actual db connection
+//        // --------------------------------------------
+//        lifecycleScope.launch {
+//            val id = Database.recipeDao.insertRecipe(
+//                Recipe(
+//                    title = "idli",
+//                    process = "hit up gay man",
+//                    notes = "test1"
+//                )
+//            )
+//            println("id inserted: $id")
+//
+//            val recipes = Database.recipeDao.getAllRecipes()
+//            println("RECIPES: $recipes")
+//        }
+//        // -----------------DB TESTING-----------------
+
+        // -----------------DB TESTING-----------------
+        // actual db connection
+        // --------------------------------------------
+        lifecycleScope.launch {
+            Database.recipeDao.insertRecipe(
+                Recipe(
+                    title = "idli",
+                    process = "hit up gay man",
+                    notes = "test1"
+                )
+            )
+        }
+        // -----------------DB TESTING-----------------
+
         enableEdgeToEdge()
         setContent {
             WhoLetThemCookTheme() {
@@ -25,19 +80,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-//@Composable
-//fun Greeting(name: String, modifier: Modifier = Modifier) {
-//    Text(
-//        text = "Hello $name!",
-//        modifier = modifier
-//    )
-//}
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    WhoLetThemCookTheme {
-//        Greeting("ihita")
-//    }
-//}
