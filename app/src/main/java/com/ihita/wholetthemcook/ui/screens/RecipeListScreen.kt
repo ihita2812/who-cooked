@@ -1,39 +1,36 @@
 package com.ihita.wholetthemcook.ui.screens
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ihita.wholetthemcook.data.Recipe
+import androidx.navigation.NavHostController
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ihita.wholetthemcook.viewmodel.RecipeListViewModel
 
 @Composable
-fun RecipeListScreen() {
-//    Box(
-//        modifier = Modifier.fillMaxSize(),
-//        contentAlignment = Alignment.Center
-//    ) {
-//        Text("Recipe List (coming soon!)")
-//    }
+fun RecipeListScreen(
+    navController: NavHostController,
+    viewModel: RecipeListViewModel = viewModel()
+) {
+    val recipes by viewModel.recipes.collectAsState()
 
-    val dummyRecipes = listOf(
-        Recipe(1, "adiddy"),
-        Recipe(2, "nigesh"),
-        Recipe(3, "idli")
-    )
+//    Text("These are all the recipes!", modifier=Modifier.padding(16.dp))
 
     LazyColumn {
-        items(dummyRecipes) { recipe ->
+        items(recipes) { recipe ->
             Text(
                 text = recipe.title,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .clickable {
+                        navController.navigate("recipeInfo/${recipe.id}")
+                    }
                     .padding(16.dp)
             )
         }

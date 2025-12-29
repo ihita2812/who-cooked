@@ -29,20 +29,26 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+//        // -----------------DB TESTING-----------------
+//        // without lifecycle scope
+//        // --------------------------------------------
 //        db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "who-cooked-db").build()
 //        val recipeDao = db.recipeDao()
 //        val ingredientDao = db.ingredientDao()
 //        val ingredientSetDao = db.ingredientSetDao()
+//        // -----------------DB TESTING-----------------
 
         Database.init(applicationContext)
 
 //        // -----------------DB TESTING-----------------
+//        // without actual db connection
+//        // --------------------------------------------
 //        lifecycleScope.launch {
 //            val id = Database.recipeDao.insertRecipe(
 //                Recipe(
-//                    title = "Test Recipe",
-//                    process = "Mix everything",
-//                    notes = "Suspend test"
+//                    title = "idli",
+//                    process = "hit up gay man",
+//                    notes = "test1"
 //                )
 //            )
 //            println("id inserted: $id")
@@ -52,6 +58,20 @@ class MainActivity : ComponentActivity() {
 //        }
 //        // -----------------DB TESTING-----------------
 
+        // -----------------DB TESTING-----------------
+        // actual db connection
+        // --------------------------------------------
+        lifecycleScope.launch {
+            Database.recipeDao.insertRecipe(
+                Recipe(
+                    title = "idli",
+                    process = "hit up gay man",
+                    notes = "test1"
+                )
+            )
+        }
+        // -----------------DB TESTING-----------------
+
         enableEdgeToEdge()
         setContent {
             WhoLetThemCookTheme() {
@@ -60,19 +80,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-//@Composable
-//fun Greeting(name: String, modifier: Modifier = Modifier) {
-//    Text(
-//        text = "Hello $name!",
-//        modifier = modifier
-//    )
-//}
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    WhoLetThemCookTheme {
-//        Greeting("ihita")
-//    }
-//}
