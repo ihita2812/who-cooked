@@ -11,4 +11,7 @@ interface RecipeDao {
 
     @Query("SELECT * FROM Recipe")
     suspend fun getAllRecipes(): List<Recipe>
+
+    @Query("SELECT * FROM Recipe WHERE id = :recipeId")
+    suspend fun getRecipeById(recipeId: Int): Recipe
 }

@@ -18,3 +18,4 @@ Android app for the recipes of 401.
 - edit recipe
 - bg: soft paper ish
 - CONVERT TO CHECK LIST ? I AM SO BIG BRAIN
+- "process" to be a numbered list

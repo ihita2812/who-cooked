@@ -8,18 +8,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class RecipeListViewModel : ViewModel() {
+class RecipeInfoViewModel(private val recipeId: Int) : ViewModel() {
 
-    private val _recipes = MutableStateFlow<List<Recipe>>(emptyList())
-    val recipes: StateFlow<List<Recipe>> = _recipes
+    private val _recipe = MutableStateFlow<Recipe?>(null)
+    val recipe: StateFlow<Recipe?> = _recipe
 
     init {
-        loadRecipes()
+        loadRecipe()
     }
 
-    private fun loadRecipes() {
+    private fun loadRecipe() {
         viewModelScope.launch {
-            _recipes.value = Database.recipeDao.getAllRecipes()
+            _recipe.value = Database.recipeDao.getRecipeById(recipeId)
         }
     }
 }
