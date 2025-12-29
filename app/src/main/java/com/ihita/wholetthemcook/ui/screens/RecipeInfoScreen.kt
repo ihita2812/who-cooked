@@ -11,12 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
+import androidx.navigation.NavController
 
 import com.ihita.wholetthemcook.viewmodel.RecipeInfoViewModel
 import com.ihita.wholetthemcook.viewmodel.RecipeInfoViewModelFactory
+import com.ihita.wholetthemcook.navigation.Routes
 
 @Composable
-fun RecipeInfoScreen(recipeId: Int, onBackClick: () -> Unit, onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
+fun RecipeInfoScreen(recipeId: Int, onBackClick: () -> Unit, onEditClick: () -> Unit, onDeleteClick: () -> Unit, navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -63,7 +65,7 @@ fun RecipeInfoScreen(recipeId: Int, onBackClick: () -> Unit, onEditClick: () -> 
                 Text("Back")
             }
 
-            Button(onClick = onEditClick) {
+            Button(onClick = {navController.navigate(route = "${Routes.ROUTE_EDIT_RECIPE}/${recipeId}")}) {
                 Text("Edit")
             }
 

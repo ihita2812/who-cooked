@@ -1,5 +1,6 @@
 package com.ihita.wholetthemcook.navigation
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -23,7 +24,7 @@ fun WhoLetThemCookNavGraph() {
             RecipeListScreen(navController)
         }
 
-        composable(route = "${Routes.RECIPE_INFO}/{recipeId}") { backStackEntry ->
+        composable("${Routes.RECIPE_INFO}/{recipeId}") { backStackEntry ->
 
             val recipeId = backStackEntry.arguments
                 ?.getString("recipeId")
@@ -33,8 +34,22 @@ fun WhoLetThemCookNavGraph() {
                 recipeId = recipeId,
                 onBackClick = { navController.popBackStack() },
                 onEditClick = { /* TODO */ },
-                onDeleteClick = { /* TODO */ }
+                onDeleteClick = { /* TODO */ },
+                navController
             )
+        }
+
+        composable(Routes.ROUTE_ADD_RECIPE) {
+            AddEditRecipeScreen(null, navController)
+        }
+
+        composable("${Routes.ROUTE_EDIT_RECIPE}/{recipeId}") { backStackEntry ->
+
+            val recipeId = backStackEntry.arguments
+                ?.getString("recipeId")
+                ?.toLong() ?: return@composable
+
+            AddEditRecipeScreen(recipeId = recipeId, navController)
         }
     }
 }
