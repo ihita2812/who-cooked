@@ -31,16 +31,16 @@ fun WhoLetThemCookNavGraph() {
                 ?.toInt() ?: return@composable
 
             RecipeInfoScreen(
-                recipeId = recipeId,
+                navController,
+                recipeId,
                 onBackClick = { navController.popBackStack() },
                 onEditClick = { /* TODO */ },
-                onDeleteClick = { /* TODO */ },
-                navController
+                onDeleteClick = { /* TODO */ }
             )
         }
 
         composable(Routes.ROUTE_ADD_RECIPE) {
-            AddEditRecipeScreen(null, navController)
+            AddEditRecipeScreen(navController)
         }
 
         composable("${Routes.ROUTE_EDIT_RECIPE}/{recipeId}") { backStackEntry ->
@@ -49,7 +49,7 @@ fun WhoLetThemCookNavGraph() {
                 ?.getString("recipeId")
                 ?.toLong() ?: return@composable
 
-            AddEditRecipeScreen(recipeId = recipeId, navController)
+            AddEditRecipeScreen(navController, recipeId, {/* TODO */})
         }
     }
 }
