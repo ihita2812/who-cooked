@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
                 Recipe(
                     title = "idli",
                     process = "hit up gay man",
-                    notes = "test1"
+                    notes = "test3"
                 )
             )
         }

@@ -3,12 +3,12 @@
 Android app for the recipes of 401.
 
 ## `recipe-list` screen
-- don't cache, keep live
-- options when a recipe is selected
-- option to select multiple recipes
+- ~~don't cache, keep live~~
+- ~~select a recipe~~
+- export as pdf
 - pagination?
 - search
-- favourites
+- favourites/pins
 
 ## `recipe-info` screen
 - edit recipe
