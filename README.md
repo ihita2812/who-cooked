@@ -12,7 +12,7 @@ Android app for the recipes of 401.
 ## `recipe-info` screen
 - load ingredients
 - ~~edit recipe button~~
-- delete recipe button
+- ~~delete recipe button~~
 - CONVERT PROCESS TO CHECK LIST ? I AM SO BIG BRAIN
 - "process" to be a numbered list
 
