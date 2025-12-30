@@ -19,8 +19,7 @@ import kotlinx.coroutines.launch
 import com.ihita.wholetthemcook.ui.theme.WhoLetThemCookTheme
 import com.ihita.wholetthemcook.navigation.WhoLetThemCookNavGraph
 import com.ihita.wholetthemcook.data.Database
-import com.ihita.wholetthemcook.data.AppDatabase
-import com.ihita.wholetthemcook.data.RecipeDao
+import com.ihita.wholetthemcook.data.insertDummyRecipes
 import com.ihita.wholetthemcook.data.Recipe
 
 class MainActivity : ComponentActivity() {
@@ -66,11 +65,18 @@ class MainActivity : ComponentActivity() {
 //                Recipe(
 //                    title = "idli",
 //                    process = "hit up gay man",
-//                    notes = "test1"
+//                    notes = "test4",
+//                    dateAdded = "301225",
+//                    dateOpened = "301225"
 //                )
 //            )
 //        }
 //        // -----------------DB TESTING-----------------
+
+        lifecycleScope.launch {
+            val dao = Database.recipeDao
+//            insertDummyRecipes(dao)
+        }
 
         enableEdgeToEdge()
         setContent {

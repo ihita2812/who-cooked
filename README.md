@@ -3,11 +3,18 @@
 Android app for the recipes of 401.
 
 ## `recipe-list` screen
-- options when a recipe is selected
-- option to select multiple recipes
+- ~~don't cache, keep live~~
+- ~~select a recipe~~
+- ~~search~~
+- ~~sort~~
+- ~~add~~
+- ~~edit~~
+- favourites/pins
+- ~~datetime integration~~
+- export as pdf
+- ~~bring most recently edited on top (if mode is such)~~
 - pagination?
-- search
-- favourites
+- add proper logos
 
 ## `recipe-info` screen
 - load ingredients

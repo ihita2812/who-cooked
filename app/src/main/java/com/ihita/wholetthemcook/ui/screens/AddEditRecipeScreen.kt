@@ -12,9 +12,10 @@ import androidx.navigation.NavController
 import com.ihita.wholetthemcook.data.Database
 import com.ihita.wholetthemcook.data.Recipe
 import kotlinx.coroutines.launch
+import java.util.Date
 
 @Composable
-fun AddEditRecipeScreen(recipeId: Long? = null, navController: NavController, onSave: () -> Unit = {}) {
+fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null, onSave: () -> Unit = {}) {
     val scope = rememberCoroutineScope()
 
     // State for form fields
@@ -22,12 +23,16 @@ fun AddEditRecipeScreen(recipeId: Long? = null, navController: NavController, on
     // var ingredients by remember
     var process by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
+    var dateCreated by remember { mutableStateOf(Date()) }
+    var dateOpened by remember { mutableStateOf(Date()) }
 
     // Load existing recipe if editing
     LaunchedEffect(recipeId) {
         if (recipeId != null) {
             val recipe = Database.recipeDao.getRecipeById(recipeId)
             title = recipe.title
+            dateCreated = recipe.dateAdded
+            dateOpened = Date()
             // ingredients
             process = recipe.process ?: ""
             notes = recipe.notes ?: ""
@@ -74,15 +79,11 @@ fun AddEditRecipeScreen(recipeId: Long? = null, navController: NavController, on
                 scope.launch {
                     if (recipeId == null) {
                         Database.recipeDao.insertRecipe(
-                            Recipe(title = title, process = process, notes = notes)
+                            Recipe(title = title, process = process, notes = notes, dateAdded = dateCreated, dateOpened = dateOpened)
                         )
                     } else {
-                        /* TODO */
-                        /* -------------------------------------------
-                        Database.recipeDao.updateRecipe(
-                            Recipe(id = recipeId, title = title, process = process, notes = notes)
-                        )
-                        -------------------------------------------*/
+                        val updatedRecipe = Recipe(id = recipeId, title = title, process = process, notes = notes, dateAdded = dateCreated, dateOpened = dateOpened)
+                        Database.recipeDao.updateRecipe(updatedRecipe)
                     }
                     onSave()
                 }
