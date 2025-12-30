@@ -2,22 +2,28 @@
 
 Android app for the recipes of 401.
 
-## RECIPE-LIST BRANCH
-
-### `recipe-list` screen
-- options when a recipe is selected
-- option to select multiple recipes
+## `recipe-list` screen
+- ~~don't cache, keep live~~
+- ~~select a recipe~~
+- ~~search~~
+- ~~sort~~
+- ~~add~~
+- ~~edit~~
+- favourites/pins
+- ~~datetime integration~~
+- export as pdf
+- ~~bring most recently edited on top (if mode is such)~~
 - pagination?
-- search
-- favourites
+- add proper logos
 
-### `recipe-info` screen
-- edit recipe
-- bg: soft paper ish
+## `recipe-info` screen
+- load ingredients
+- ~~edit recipe button~~
+- ~~delete recipe button~~
 - CONVERT PROCESS TO CHECK LIST ? I AM SO BIG BRAIN
 - "process" to be a numbered list
 
-### `recipe-add` screen
+## `recipe-add` screen
 - cancel button
 - save button
 - format the ingredients and all
