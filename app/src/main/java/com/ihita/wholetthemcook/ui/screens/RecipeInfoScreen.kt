@@ -18,7 +18,7 @@ import com.ihita.wholetthemcook.viewmodel.RecipeInfoViewModelFactory
 import com.ihita.wholetthemcook.navigation.Routes
 
 @Composable
-fun RecipeInfoScreen(recipeId: Int, onBackClick: () -> Unit, onEditClick: () -> Unit, onDeleteClick: () -> Unit, navController: NavController) {
+fun RecipeInfoScreen(navController: NavController, recipeId: Int, onBackClick: () -> Unit, onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()

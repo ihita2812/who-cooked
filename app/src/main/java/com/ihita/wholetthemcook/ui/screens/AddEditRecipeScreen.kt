@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import java.util.Date
 
 @Composable
-fun AddEditRecipeScreen(recipeId: Long? = null, navController: NavController, onSave: () -> Unit = {}) {
+fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null, onSave: () -> Unit = {}) {
     val scope = rememberCoroutineScope()
 
     // State for form fields
