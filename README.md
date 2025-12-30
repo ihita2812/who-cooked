@@ -5,10 +5,12 @@ Android app for the recipes of 401.
 ## `recipe-list` screen
 - ~~don't cache, keep live~~
 - ~~select a recipe~~
-- export as pdf
-- pagination?
-- search
+- search : SEMI DONE
+- sort : SEMI DONE
 - favourites/pins
+- export as pdf
+- bring most recently edited on top (if mode is such) : I THINK DONE?
+- pagination?
 
 ## `recipe-info` screen
 - edit recipe

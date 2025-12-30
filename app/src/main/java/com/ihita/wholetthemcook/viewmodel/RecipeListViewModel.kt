@@ -4,30 +4,58 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
-
-import com.ihita.wholetthemcook.data.Database
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class RecipeListViewModel : ViewModel() {
+import com.ihita.wholetthemcook.data.Database
+import com.ihita.wholetthemcook.data.Database.recipeDao
+import com.ihita.wholetthemcook.data.Recipe
+import com.ihita.wholetthemcook.ui.components.SortOption
+import kotlinx.coroutines.flow.combine
 
-    val recipes = Database.recipeDao
-        .getAllRecipes()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
-        )
+class RecipeListViewModel : ViewModel() {
 
     private val _selectedRecipeIds = MutableStateFlow<Set<Long>>(emptySet())
     val selectedRecipeIds: StateFlow<Set<Long>> = _selectedRecipeIds
 
-    val isSelectionMode: StateFlow<Boolean> =
-        selectedRecipeIds.map { it.isNotEmpty() }
-            .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery
+
+    private val _sortOption = MutableStateFlow(SortOption.DATE_ADDED)
+    val sortOption: StateFlow<SortOption> = _sortOption
+
+
+    val isSelectionMode: StateFlow<Boolean> = selectedRecipeIds.map { it.isNotEmpty() }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    val recipes: StateFlow<List<Recipe>> = combine(recipeDao.getAllRecipes(), searchQuery, sortOption) { recipes, query, sort ->
+
+        val filtered = if (query.isBlank()) {
+            recipes
+        } else {
+            recipes.filter {
+                it.title.contains(query, ignoreCase = true)
+            }
+        }
+
+        when (sort) {
+            SortOption.DATE_ADDED ->
+                filtered.sortedByDescending { it.createdAt }
+
+            SortOption.DATE_MODIFIED ->
+                filtered.sortedByDescending { it.updatedAt }
+
+            SortOption.TITLE_ASC ->
+                filtered.sortedBy { it.title.lowercase() }
+
+            SortOption.TITLE_DESC ->
+                filtered.sortedByDescending { it.title.lowercase() }
+        }
+
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     fun toggleSelection(recipeId: Long) {
         _selectedRecipeIds.update { current ->
@@ -48,4 +76,13 @@ class RecipeListViewModel : ViewModel() {
             clearSelection()
         }
     }
+
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
+
+    fun updateSortOption(option: SortOption) {
+        _sortOption.value = option
+    }
+
 }
