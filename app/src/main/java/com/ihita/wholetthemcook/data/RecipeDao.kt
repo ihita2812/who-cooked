@@ -3,6 +3,8 @@ package com.ihita.wholetthemcook.data
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import java.util.Date
+import java.util.stream.DoubleStream.iterate
 
 @Dao
 interface RecipeDao {
@@ -17,4 +19,9 @@ interface RecipeDao {
 
     @Query("DELETE FROM Recipe WHERE id = :recipeId")
     suspend fun deleteById(recipeId: Long)
+
+    @Query("UPDATE Recipe SET dateOpened = :date WHERE id = :recipeId")
+    suspend fun updateDateOpened(recipeId: Long, date: Date)
+
+//    @Query("UPDATE Recipe SET " + iterate(:wals) {wal -> ""} )
 }

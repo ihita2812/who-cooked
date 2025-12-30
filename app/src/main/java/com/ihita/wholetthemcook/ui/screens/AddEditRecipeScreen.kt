@@ -12,6 +12,7 @@ import androidx.navigation.NavController
 import com.ihita.wholetthemcook.data.Database
 import com.ihita.wholetthemcook.data.Recipe
 import kotlinx.coroutines.launch
+import java.util.Date
 
 @Composable
 fun AddEditRecipeScreen(recipeId: Long? = null, navController: NavController, onSave: () -> Unit = {}) {
@@ -22,15 +23,24 @@ fun AddEditRecipeScreen(recipeId: Long? = null, navController: NavController, on
     // var ingredients by remember
     var process by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
+    var dateCreated by remember { mutableStateOf(Date()) }
+    var dateOpened by remember { mutableStateOf(Date()) }
 
     // Load existing recipe if editing
     LaunchedEffect(recipeId) {
         if (recipeId != null) {
             val recipe = Database.recipeDao.getRecipeById(recipeId)
             title = recipe.title
+            dateCreated = recipe.dateAdded
             // ingredients
             process = recipe.process ?: ""
             notes = recipe.notes ?: ""
+            Database.recipeDao.insertRecipe(
+                Recipe(title = title, process = process, notes = notes, dateAdded = dateCreated, dateOpened = dateOpened)
+            )
+        } else {
+            dateOpened = Date()
+            dateCreated = Date()
         }
     }
 
@@ -74,7 +84,7 @@ fun AddEditRecipeScreen(recipeId: Long? = null, navController: NavController, on
                 scope.launch {
                     if (recipeId == null) {
                         Database.recipeDao.insertRecipe(
-                            Recipe(title = title, process = process, notes = notes)
+                            Recipe(title = title, process = process, notes = notes, dateAdded = dateCreated, dateOpened = dateOpened)
                         )
                     } else {
                         /* TODO */

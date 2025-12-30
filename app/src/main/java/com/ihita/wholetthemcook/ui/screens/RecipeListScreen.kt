@@ -6,13 +6,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+//import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -20,6 +21,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -50,49 +52,46 @@ fun RecipeListScreen(navController: NavController) {
     val selectedIds by listViewModel.selectedRecipeIds.collectAsState()
     val isSelectionMode by listViewModel.isSelectionMode.collectAsState()
 
-    Column {
-
-        Scaffold(
-            topBar = {
-                if (isSelectionMode) {
-                    SelectionTopBar(
-                        selectedCount = selectedIds.size,
-                        onDelete = listViewModel::deleteSelectedRecipes,
-                        onEdit = {
-                            val id = selectedIds.first()
-                            navController.navigate("${Routes.ROUTE_EDIT_RECIPE}/$id")
-                            listViewModel.clearSelection()
-                        },
-                        // onExport = /* TODO */,
-                        onClearSelection = listViewModel::clearSelection
-                    )
-                } else {
-                    DefaultTopBar(
-                        searchQuery = searchQuery,
-                        onSearchChange = listViewModel::updateSearchQuery,
-                        onSortSelected = listViewModel::updateSortOption
-                    )
-                }
+    Scaffold(
+        topBar = {
+            if (isSelectionMode) {
+                SelectionTopBar(
+                    selectedCount = selectedIds.size,
+                    onDelete = listViewModel::deleteSelectedRecipes,
+                    onEdit = {
+                        val id = selectedIds.first()
+                        navController.navigate("${Routes.ROUTE_EDIT_RECIPE}/$id")
+                        listViewModel.clearSelection()
+                    },
+                    // onExport = /* TODO */,
+                    onClearSelection = listViewModel::clearSelection
+                )
+            } else {
+                DefaultTopBar(
+                    searchQuery = searchQuery,
+                    onSearchChange = listViewModel::updateSearchQuery,
+                    onSortSelected = listViewModel::updateSortOption
+                )
             }
-        ) { padding ->
-            LazyColumn {
-                items(recipes) { recipe ->
-                    RecipeRow(
-                        recipe = recipe,
-                        isSelected = selectedIds.contains(recipe.id),
-                        onClick = {
-                            if (isSelectionMode) {
-                                listViewModel.toggleSelection(recipe.id)
-                            } else {
-                                navController.navigate("${Routes.RECIPE_INFO}/${recipe.id}")
-                            }
-                        },
-                        onLongClick = {
+        }
+    ) { padding ->
+        LazyColumn(modifier = Modifier.padding(padding)) {
+            items(recipes) { recipe ->
+                RecipeRow(
+                    recipe = recipe,
+                    isSelected = selectedIds.contains(recipe.id),
+                    onClick = {
+                        if (isSelectionMode) {
                             listViewModel.toggleSelection(recipe.id)
+                        } else {
+                            navController.navigate("${Routes.RECIPE_INFO}/${recipe.id}")
                         }
+                    },
+                    onLongClick = {
+                        listViewModel.toggleSelection(recipe.id)
+                    }
 
-                    )
-                }
+                )
             }
         }
     }
@@ -145,8 +144,10 @@ fun DefaultTopBar(searchQuery: String, onSearchChange: (String) -> Unit, onSortS
                 placeholder = { Text("Search recipes") },
                 singleLine = true,
                 modifier = Modifier,
-                colors = TextFieldDefaults.textFieldColors(
-                    containerColor = Color.Transparent,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 )
@@ -154,7 +155,7 @@ fun DefaultTopBar(searchQuery: String, onSearchChange: (String) -> Unit, onSortS
         },
         actions = {
             IconButton(onClick = { showSortMenu = true }) {
-                Icon(imageVector = Icons.Default.Sort, contentDescription = "Sort")
+                Icon(imageVector = Icons.Filled.Sort, contentDescription = "Sort")
             }
 
             DropdownMenu(expanded = showSortMenu, onDismissRequest = { showSortMenu = false }) {

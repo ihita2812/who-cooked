@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-import com.ihita.wholetthemcook.data.Database
 import com.ihita.wholetthemcook.data.Database.recipeDao
 import com.ihita.wholetthemcook.data.Recipe
 import com.ihita.wholetthemcook.ui.components.SortOption
@@ -43,10 +42,10 @@ class RecipeListViewModel : ViewModel() {
 
         when (sort) {
             SortOption.DATE_ADDED ->
-                filtered.sortedByDescending { it.createdAt }
+                filtered.sortedByDescending { it.dateAdded }
 
             SortOption.DATE_MODIFIED ->
-                filtered.sortedByDescending { it.updatedAt }
+                filtered.sortedByDescending { it.dateOpened }
 
             SortOption.TITLE_ASC ->
                 filtered.sortedBy { it.title.lowercase() }
@@ -71,7 +70,7 @@ class RecipeListViewModel : ViewModel() {
     fun deleteSelectedRecipes() {
         viewModelScope.launch {
             _selectedRecipeIds.value.forEach { id ->
-                Database.recipeDao.deleteById(id)
+                recipeDao.deleteById(id)
             }
             clearSelection()
         }
