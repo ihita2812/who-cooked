@@ -7,6 +7,8 @@ Android app for the recipes of 401.
 - ~~select a recipe~~
 - ~~search~~
 - ~~sort~~
+- ~~add~~
+- ~~edit~~
 - favourites/pins
 - ~~datetime integration~~
 - export as pdf

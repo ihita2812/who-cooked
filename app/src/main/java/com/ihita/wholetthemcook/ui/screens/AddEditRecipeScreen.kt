@@ -32,15 +32,10 @@ fun AddEditRecipeScreen(recipeId: Long? = null, navController: NavController, on
             val recipe = Database.recipeDao.getRecipeById(recipeId)
             title = recipe.title
             dateCreated = recipe.dateAdded
+            dateOpened = Date()
             // ingredients
             process = recipe.process ?: ""
             notes = recipe.notes ?: ""
-            Database.recipeDao.insertRecipe(
-                Recipe(title = title, process = process, notes = notes, dateAdded = dateCreated, dateOpened = dateOpened)
-            )
-        } else {
-            dateOpened = Date()
-            dateCreated = Date()
         }
     }
 
@@ -87,12 +82,8 @@ fun AddEditRecipeScreen(recipeId: Long? = null, navController: NavController, on
                             Recipe(title = title, process = process, notes = notes, dateAdded = dateCreated, dateOpened = dateOpened)
                         )
                     } else {
-                        /* TODO */
-                        /* -------------------------------------------
-                        Database.recipeDao.updateRecipe(
-                            Recipe(id = recipeId, title = title, process = process, notes = notes)
-                        )
-                        -------------------------------------------*/
+                        val updatedRecipe = Recipe(id = recipeId, title = title, process = process, notes = notes, dateAdded = dateCreated, dateOpened = dateOpened)
+                        Database.recipeDao.updateRecipe(updatedRecipe)
                     }
                     onSave()
                 }
