@@ -28,15 +28,9 @@ fun WhoLetThemCookNavGraph() {
 
             val recipeId = backStackEntry.arguments
                 ?.getString("recipeId")
-                ?.toInt() ?: return@composable
+                ?.toLong() ?: return@composable
 
-            RecipeInfoScreen(
-                recipeId = recipeId,
-                onBackClick = { navController.popBackStack() },
-                onEditClick = { /* TODO */ },
-                onDeleteClick = { /* TODO */ },
-                navController
-            )
+            RecipeInfoScreen(navController, recipeId, { /* TODO */ })
         }
 
         composable(Routes.ROUTE_ADD_RECIPE) {

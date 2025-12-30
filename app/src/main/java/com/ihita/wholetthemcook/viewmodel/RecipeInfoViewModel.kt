@@ -13,6 +13,9 @@ class RecipeInfoViewModel(private val recipeId: Long) : ViewModel() {
     private val _recipe = MutableStateFlow<Recipe?>(null)
     val recipe: StateFlow<Recipe?> = _recipe
 
+    private val _isDeleted = MutableStateFlow(false)
+    val isDeleted: StateFlow<Boolean> = _isDeleted
+
     init {
         loadRecipe()
     }
@@ -20,6 +23,13 @@ class RecipeInfoViewModel(private val recipeId: Long) : ViewModel() {
     private fun loadRecipe() {
         viewModelScope.launch {
             _recipe.value = Database.recipeDao.getRecipeById(recipeId)
+        }
+    }
+
+    fun deleteRecipe() {
+        viewModelScope.launch {
+            Database.recipeDao.deleteRecipeById(recipeId)
+            _isDeleted.value = true
         }
     }
 }

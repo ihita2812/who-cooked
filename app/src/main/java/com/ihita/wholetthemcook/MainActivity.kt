@@ -58,19 +58,19 @@ class MainActivity : ComponentActivity() {
 //        }
 //        // -----------------DB TESTING-----------------
 
-        // -----------------DB TESTING-----------------
-        // actual db connection
-        // --------------------------------------------
-        lifecycleScope.launch {
-            Database.recipeDao.insertRecipe(
-                Recipe(
-                    title = "idli",
-                    process = "hit up gay man",
-                    notes = "test1"
-                )
-            )
-        }
-        // -----------------DB TESTING-----------------
+//        // -----------------DB TESTING-----------------
+//        // actual db connection
+//        // --------------------------------------------
+//        lifecycleScope.launch {
+//            Database.recipeDao.insertRecipe(
+//                Recipe(
+//                    title = "idli",
+//                    process = "hit up gay man",
+//                    notes = "test1"
+//                )
+//            )
+//        }
+//        // -----------------DB TESTING-----------------
 
         enableEdgeToEdge()
         setContent {
