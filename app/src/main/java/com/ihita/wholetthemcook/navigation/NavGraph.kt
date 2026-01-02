@@ -26,7 +26,7 @@ fun WhoLetThemCookNavGraph() {
                 ?.getString("recipeId")
                 ?.toLong() ?: return@composable
 
-            RecipeInfoScreen(navController, recipeId, { /* TODO */ })
+            RecipeInfoScreen(navController, recipeId)
         }
 
         composable(Routes.ROUTE_ADD_RECIPE) {
