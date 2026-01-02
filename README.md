@@ -18,8 +18,9 @@ Android app for the recipes of 401.
 - add proper logos
 
 ## `recipe-info` screen
-- edit recipe
-- bg: soft paper ish
+- load ingredients
+- ~~edit recipe button~~
+- ~~delete recipe button~~
 - CONVERT PROCESS TO CHECK LIST ? I AM SO BIG BRAIN
 - "process" to be a numbered list
 
