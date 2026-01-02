@@ -15,7 +15,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
@@ -53,13 +56,15 @@ fun RecipeListScreen(navController: NavController) {
     val searchQuery by listViewModel.searchQuery.collectAsState()
     val selectedIds by listViewModel.selectedRecipeIds.collectAsState()
     val isSelectionMode by listViewModel.isSelectionMode.collectAsState()
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             if (isSelectionMode) {
                 SelectionTopBar(
                     selectedCount = selectedIds.size,
-                    onDelete = listViewModel::deleteSelectedRecipes,
+//                    onDelete = listViewModel::deleteSelectedRecipes,
+                    onDelete = { showDeleteDialog = true },
                     onEdit = {
                         val id = selectedIds.first()
                         navController.navigate("${Routes.ROUTE_EDIT_RECIPE}/$id")
@@ -105,6 +110,32 @@ fun RecipeListScreen(navController: NavController) {
                 )
             }
         }
+    }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete recipes?") },
+            text = { Text("Are you sure you want to delete ${selectedIds.size} recipe(s)?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        listViewModel.deleteSelectedRecipes()
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 
 }
