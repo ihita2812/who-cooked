@@ -28,7 +28,7 @@ class RecipeInfoViewModel(private val recipeId: Long) : ViewModel() {
 
     fun deleteRecipe() {
         viewModelScope.launch {
-            Database.recipeDao.deleteRecipeById(recipeId)
+            Database.recipeDao.deleteById(recipeId)
             _isDeleted.value = true
         }
     }

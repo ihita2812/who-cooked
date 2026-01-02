@@ -10,21 +10,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 
 import com.ihita.wholetthemcook.viewmodel.RecipeInfoViewModel
 import com.ihita.wholetthemcook.viewmodel.RecipeInfoViewModelFactory
 import com.ihita.wholetthemcook.navigation.Routes
 
-// navController.popBackStack
 @Composable
-fun RecipeInfoScreen(navController: NavController, recipeId: Long, onDeleteClick: () -> Unit) {
+fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
 
     val infoViewModel: RecipeInfoViewModel = viewModel(factory = RecipeInfoViewModelFactory(recipeId))
     val recipe by infoViewModel.recipe.collectAsState()
     val isDeleted by infoViewModel.isDeleted.collectAsState()
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(isDeleted) {
         if (isDeleted) {
@@ -93,9 +98,34 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long, onDeleteClick
                 Text("Edit")
             }
 
-            Button(onClick = { infoViewModel.deleteRecipe() }) {
+            Button(onClick = { showDeleteDialog = true }) {
                 Text("Delete")
             }
         }
     }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+
+            title = { Text("Delete recipe?") },
+            text = { Text("Are you sure you want to delete \"${recipe?.title}\"?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        infoViewModel.deleteRecipe()
+                    }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
 }
