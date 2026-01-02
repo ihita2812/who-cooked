@@ -24,6 +24,6 @@ Android app for the recipes of 401.
 - "process" to be a numbered list
 
 ## `recipe-add` screen
-- cancel button
-- save button
+- ~~cancel button~~
+- ~~save button~~
 - format the ingredients and all

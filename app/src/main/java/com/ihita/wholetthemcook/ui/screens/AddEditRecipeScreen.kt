@@ -85,6 +85,7 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null, on
                         val updatedRecipe = Recipe(id = recipeId, title = title, process = process, notes = notes, dateAdded = dateCreated, dateOpened = dateOpened)
                         Database.recipeDao.updateRecipe(updatedRecipe)
                     }
+                    navController.popBackStack()
                     onSave()
                 }
             },
@@ -93,10 +94,8 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null, on
             Text(if (recipeId == null) "Add Recipe" else "Save Changes")
         }
 
-        // CANCEL BUTTON
-        /* TODO */
-//        Button(onClick = navController.) {
-//            Text("Cancel")
-//        }
+        Button(onClick = { navController.popBackStack() }) {
+            Text("Cancel")
+        }
     }
 }
