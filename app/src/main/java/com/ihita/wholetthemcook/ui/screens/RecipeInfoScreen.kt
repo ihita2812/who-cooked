@@ -30,7 +30,24 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
     val infoViewModel: RecipeInfoViewModel = viewModel(factory = RecipeInfoViewModelFactory(recipeId))
     val recipe by infoViewModel.recipe.collectAsState()
     val isDeleted by infoViewModel.isDeleted.collectAsState()
+    val ingredients by infoViewModel.ingredients.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
+
+    val updated =
+        navController.currentBackStackEntry
+            ?.savedStateHandle
+            ?.getStateFlow("recipe_updated", false)
+            ?.collectAsState()
+
+    LaunchedEffect(updated?.value) {
+        if (updated?.value == true) {
+            infoViewModel.reload()
+            navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.remove<Boolean>("recipe_updated")
+        }
+    }
+
 
     LaunchedEffect(isDeleted) {
         if (isDeleted) {
@@ -61,7 +78,6 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
         // Ingredients
         Text(text = "Ingredients", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(4.dp))
-        val ingredients by infoViewModel.ingredients.collectAsState()
         LazyColumn {
             items(items = ingredients) { item ->
                 Text(

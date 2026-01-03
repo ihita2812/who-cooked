@@ -34,7 +34,7 @@ class RecipeInfoViewModel(private val recipeId: Long) : ViewModel() {
         }
     }
 
-    private fun loadIngredients() {
+    fun reload() {
         viewModelScope.launch {
             _ingredients.value = Database.ingredientSetDao.getIngredientsForRecipe(recipeId)
         }
@@ -42,7 +42,7 @@ class RecipeInfoViewModel(private val recipeId: Long) : ViewModel() {
 
     init {
 //        loadRecipe()
-        loadIngredients()
+        reload()
     }
 
 }

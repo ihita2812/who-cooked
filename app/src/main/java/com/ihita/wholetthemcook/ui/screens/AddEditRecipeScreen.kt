@@ -112,6 +112,9 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
             onClick = {
                 scope.launch {
                     RecipeRepository.saveRecipeWithIngredients(recipeId, title, process, notes, ingredients.map { IngredientInput(name = it.name.trim(), quantity = it.quantity.trim(), unit = it.unit.trim(), notes = it.notes.trim()) })
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("recipe_updated", true)
                     navController.popBackStack()
                 }
             },
