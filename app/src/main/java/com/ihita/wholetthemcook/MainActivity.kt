@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import com.ihita.wholetthemcook.ui.theme.WhoLetThemCookTheme
 import com.ihita.wholetthemcook.navigation.WhoLetThemCookNavGraph
 import com.ihita.wholetthemcook.data.Database
-import com.ihita.wholetthemcook.data.insertDummyRecipes
+import com.ihita.wholetthemcook.data.DummyDataSeeder
 import com.ihita.wholetthemcook.data.Recipe
 
 class MainActivity : ComponentActivity() {
@@ -75,7 +75,7 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             val dao = Database.recipeDao
-//            insertDummyRecipes(dao)
+//            DummyDataSeeder.seed(Database)
         }
 
         enableEdgeToEdge()

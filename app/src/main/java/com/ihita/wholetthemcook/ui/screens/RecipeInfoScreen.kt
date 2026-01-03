@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.TextButton
@@ -60,12 +61,21 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
         // Ingredients
         Text(text = "Ingredients", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(4.dp))
-        /* TODO */
-        LazyColumn(
-            modifier = Modifier.weight(1f)
-        ) {
-            items(3) { index ->
-                Text(text = "• Ingredient $index – 2 cups")
+        val ingredients by infoViewModel.ingredients.collectAsState()
+        LazyColumn {
+            items(items = ingredients) { item ->
+                Text(
+                    text = buildString {
+                        append("• ")
+                        append(item.ingredient.title)
+                        if (item.ingredientSet.quantity != null) {
+                            append(" – ")
+                            append(item.ingredientSet.quantity)
+                            item.ingredientSet.unit?.let { append(" $it") }
+                        }
+                        item.ingredientSet.notes?.let { append(" ($it)") }
+                    }
+                )
             }
         }
         Spacer(modifier = Modifier.height(12.dp))

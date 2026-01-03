@@ -23,6 +23,7 @@ data class IngredientSet(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val recipeId: Long,
     val ingredientId: Long,
-    val quantity: Float = 0f,
-    val notes: String
+    val quantity: Float?,
+    val unit: String?,
+    val notes: String?
 )

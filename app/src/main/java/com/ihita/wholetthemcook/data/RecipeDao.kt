@@ -13,6 +13,9 @@ interface RecipeDao {
     @Insert
     suspend fun insertRecipe(recipe: Recipe): Long
 
+    @Insert
+    suspend fun insertAll(recipes: List<Recipe>): List<Long>
+
     @Query("SELECT * FROM Recipe ORDER BY id DESC")
     fun getAllRecipes(): kotlinx.coroutines.flow.Flow<List<Recipe>>
 
