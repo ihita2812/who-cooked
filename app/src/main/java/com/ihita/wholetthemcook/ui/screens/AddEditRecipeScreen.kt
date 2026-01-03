@@ -9,33 +9,47 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.ihita.wholetthemcook.data.Database
-import com.ihita.wholetthemcook.data.Recipe
 import kotlinx.coroutines.launch
 import java.util.Date
 
+import com.ihita.wholetthemcook.data.Database
+import com.ihita.wholetthemcook.data.Recipe
+import com.ihita.wholetthemcook.data.RecipeRepository
+import com.ihita.wholetthemcook.ui.components.IngredientInput
+import com.ihita.wholetthemcook.ui.components.IngredientRow
+
 @Composable
-fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null, onSave: () -> Unit = {}) {
+fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
     val scope = rememberCoroutineScope()
 
     // State for form fields
     var title by remember { mutableStateOf("") }
-    // var ingredients by remember
+    val ingredients = remember { mutableStateListOf<IngredientInput>() }
     var process by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
-    var dateCreated by remember { mutableStateOf(Date()) }
-    var dateOpened by remember { mutableStateOf(Date()) }
 
     // Load existing recipe if editing
     LaunchedEffect(recipeId) {
         if (recipeId != null) {
             val recipe = Database.recipeDao.getRecipeById(recipeId)
             title = recipe.title
-            dateCreated = recipe.dateAdded
-            dateOpened = Date()
-            // ingredients
             process = recipe.process ?: ""
             notes = recipe.notes ?: ""
+
+            val ingredientRecipes = Database.ingredientSetDao.getIngredientsForRecipe(recipeId)
+            ingredients.clear()
+            ingredients.addAll(ingredientRecipes.map { ir ->
+                    IngredientInput(
+                        name = ir.ingredient.title,
+                        quantity = ir.ingredientSet.quantity?.toString() ?: "",
+                        unit = ir.ingredientSet.unit ?: "",
+                        notes = ir.ingredientSet.notes ?: ""
+                    )
+                }
+            )
+            if (ingredients.isEmpty()) {
+                ingredients.add(IngredientInput(name =  "", quantity = "", unit = "", notes = ""))
+            }
         }
     }
 
@@ -50,8 +64,30 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null, on
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
         )
-
         Spacer(modifier = Modifier.height(16.dp))
+
+//        Spacer(modifier = Modifier.height(24.dp))
+        Text("Ingredients", style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+        ingredients.forEach { ingredient ->
+            IngredientRow(
+                ingredient = ingredient,
+                onChange = { updated ->
+                    val index = ingredients.indexOfFirst { it.id == updated.id }
+                    if (index != -1) {
+                        ingredients[index] = updated
+                    }
+                },
+                onDelete = {
+                    if (ingredients.size > 1) {
+                        ingredients.remove(ingredient)
+                    }
+                }
+            )
+        }
+        TextButton(onClick = { ingredients.add(IngredientInput()) }) {
+            Text("+ Add ingredient")
+        }
 
         TextField(
             value = process,
@@ -62,7 +98,6 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null, on
                 .height(200.dp),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
         )
-
         Spacer(modifier = Modifier.height(16.dp))
 
         TextField(
@@ -71,22 +106,13 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null, on
             label = { Text("Notes") },
             modifier = Modifier.fillMaxWidth()
         )
-
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
             onClick = {
                 scope.launch {
-                    if (recipeId == null) {
-                        Database.recipeDao.insertRecipe(
-                            Recipe(title = title, process = process, notes = notes, dateAdded = dateCreated, dateOpened = dateOpened)
-                        )
-                    } else {
-                        val updatedRecipe = Recipe(id = recipeId, title = title, process = process, notes = notes, dateAdded = dateCreated, dateOpened = dateOpened)
-                        Database.recipeDao.updateRecipe(updatedRecipe)
-                    }
+                    RecipeRepository.saveRecipeWithIngredients(recipeId, title, process, notes, ingredients.map { IngredientInput(name = it.name.trim(), quantity = it.quantity.trim(), unit = it.unit.trim(), notes = it.notes.trim()) })
                     navController.popBackStack()
-                    onSave()
                 }
             },
             modifier = Modifier.fillMaxWidth()
