@@ -97,9 +97,15 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
         Spacer(modifier = Modifier.height(12.dp))
 
         // Process
-        Text(text = "Process", style = MaterialTheme.typography.titleMedium)
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(text = recipe!!.process ?: "")
+        Text(
+            text = "Process",
+            style = MaterialTheme.typography.titleMedium
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        recipe!!.process.forEachIndexed { index, step ->
+            Text(text = "${index + 1}. $step")
+            Spacer(modifier = Modifier.height(4.dp))
+        }
         Spacer(modifier = Modifier.height(12.dp))
 
         // Notes

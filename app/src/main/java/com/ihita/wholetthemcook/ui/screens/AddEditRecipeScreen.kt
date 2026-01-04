@@ -1,8 +1,12 @@
 package com.ihita.wholetthemcook.ui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
@@ -25,7 +29,7 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
     // State for form fields
     var title by remember { mutableStateOf("") }
     val ingredients = remember { mutableStateListOf<IngredientInput>() }
-    var process by remember { mutableStateOf("") }
+    var processSteps = remember { mutableStateListOf<String>() }
     var notes by remember { mutableStateOf("") }
 
     // Load existing recipe if editing
@@ -33,7 +37,8 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
         if (recipeId != null) {
             val recipe = Database.recipeDao.getRecipeById(recipeId)
             title = recipe.title
-            process = recipe.process ?: ""
+            processSteps.clear()
+            processSteps.addAll(recipe.process.ifEmpty { listOf("") })
             notes = recipe.notes ?: ""
 
             val ingredientRecipes = Database.ingredientSetDao.getIngredientsForRecipe(recipeId)
@@ -66,7 +71,6 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-//        Spacer(modifier = Modifier.height(24.dp))
         Text("Ingredients", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         ingredients.forEach { ingredient ->
@@ -89,16 +93,46 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
             Text("+ Add ingredient")
         }
 
-        TextField(
-            value = process,
-            onValueChange = { process = it },
-            label = { Text("Process") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+        Text("Process", style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(8.dp))
+        LazyColumn {
+            itemsIndexed(processSteps) { index, step ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text("${index + 1}.")
+
+                    TextField(
+                        value = step,
+                        onValueChange = { processSteps[index] = it },
+                        modifier = Modifier.weight(1f),
+                        placeholder = { Text("Step ${index + 1}") }
+                    )
+
+                    IconButton(
+                        onClick = {
+                            if (processSteps.size > 1) {
+                                processSteps.removeAt(index)
+                            }
+                        }
+                    ) {
+                        Icon(Icons.Default.Delete, contentDescription = "Delete step")
+                    }
+                }
+
+                Spacer(Modifier.height(8.dp))
+            }
+        }
+
+        Button(
+            onClick = { processSteps.add("") },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Add Step")
+        }
+
+        Spacer(Modifier.height(16.dp))
 
         TextField(
             value = notes,
@@ -111,7 +145,7 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
         Button(
             onClick = {
                 scope.launch {
-                    RecipeRepository.saveRecipeWithIngredients(recipeId, title, process, notes, ingredients.map { IngredientInput(name = it.name.trim(), quantity = it.quantity.trim(), unit = it.unit.trim(), notes = it.notes.trim()) })
+                    RecipeRepository.saveRecipeWithIngredients(recipeId, title, processSteps.map { it.trim() }.filter { it.isNotEmpty() }, notes, ingredients.map { IngredientInput(name = it.name.trim(), quantity = it.quantity.trim(), unit = it.unit.trim(), notes = it.notes.trim()) })
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set("recipe_updated", true)

@@ -6,7 +6,7 @@ import java.util.Date
 
 object RecipeRepository {
 
-    suspend fun saveRecipeWithIngredients(recipeId: Long?, title: String, process: String?, notes: String?, ingredients: List<IngredientInput>) {
+    suspend fun saveRecipeWithIngredients(recipeId: Long?, title: String, process: List<String>, notes: String?, ingredients: List<IngredientInput>) {
 
         val id = if (recipeId == null) {
             Database.recipeDao.insertRecipe(

@@ -45,35 +45,35 @@ object DummyDataSeeder {
                 title = "Classic Omelette",
                 dateAdded = daysAgo(10),
                 dateOpened = daysAgo(1),
-                process = "Beat eggs, cook with butter, fold gently.",
+                process = listOf("Beat eggs", "cook with butter", "fold gently"),
                 notes = "Best with fresh eggs."
             ),
             Recipe(
                 title = "Garlic Bread",
                 dateAdded = daysAgo(20),
                 dateOpened = daysAgo(5),
-                process = "Mix butter and garlic, spread on bread, bake.",
+                process = listOf("Mix butter and garlic", "spread on bread", "bake"),
                 notes = null
             ),
             Recipe(
                 title = "Tomato Pasta",
                 dateAdded = daysAgo(5),
                 dateOpened = daysAgo(0),
-                process = "Cook pasta, prepare tomato sauce, combine.",
+                process = listOf("Cook pasta", "prepare tomato sauce", "combine"),
                 notes = "Add basil if available."
             ),
             Recipe(
                 title = "Pancakes",
                 dateAdded = daysAgo(30),
                 dateOpened = daysAgo(12),
-                process = "Mix dry and wet ingredients, cook on pan.",
+                process = listOf("Mix dry and wet ingredients", "cook on pan"),
                 notes = "Serve with honey or syrup."
             ),
             Recipe(
                 title = "Simple Salad",
                 dateAdded = daysAgo(2),
                 dateOpened = daysAgo(2),
-                process = null,
+                process = emptyList(),
                 notes = "Very flexible recipe."
             )
         )

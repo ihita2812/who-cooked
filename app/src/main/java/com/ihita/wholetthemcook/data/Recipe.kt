@@ -10,6 +10,6 @@ data class Recipe(
     val title: String,
     val dateAdded: Date,
     val dateOpened: Date,
-    val process: String? = null,
+    val process: List<String> = emptyList(),
     val notes: String? = null
 )

@@ -9,6 +9,7 @@ TODO-
 - ingredients quant float to int
 - export as pdf
 - favourites
-- process should be a list
+- ~~process should be a list~~
 - add proper icons
 - UI
+- images section
