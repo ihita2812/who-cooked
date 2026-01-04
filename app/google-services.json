@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "53050367056",
+    "project_id": "who-let-them-cook",
+    "storage_bucket": "who-let-them-cook.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:53050367056:android:5b93b21f8ca0d5c8e94555",
+        "android_client_info": {
+          "package_name": "com.ihita.wholetthemcook"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBv_nz7qnPmTvDJDLiwQvdXpg4LoAJEyGE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -2,62 +2,20 @@ package com.ihita.wholetthemcook.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ihita.wholetthemcook.data.Database.ingredientSetDao
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-import com.ihita.wholetthemcook.data.Database.recipeDao
-import com.ihita.wholetthemcook.data.ExportIngredient
+import com.ihita.wholetthemcook.data.Database
 import com.ihita.wholetthemcook.data.ExportRecipe
 import com.ihita.wholetthemcook.data.Recipe
 import com.ihita.wholetthemcook.ui.components.SortOption
-import kotlinx.coroutines.flow.combine
 
 class RecipeListViewModel : ViewModel() {
 
     private val _selectedRecipeIds = MutableStateFlow<Set<Long>>(emptySet())
     val selectedRecipeIds: StateFlow<Set<Long>> = _selectedRecipeIds
 
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery: StateFlow<String> = _searchQuery
-
-    private val _sortOption = MutableStateFlow(SortOption.DATE_ADDED)
-    val sortOption: StateFlow<SortOption> = _sortOption
-
-
-    val isSelectionMode: StateFlow<Boolean> = selectedRecipeIds.map { it.isNotEmpty() }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
-
-    val recipes: StateFlow<List<Recipe>> = combine(recipeDao.getAllRecipes(), searchQuery, sortOption) { recipes, query, sort ->
-
-        val filtered = if (query.isBlank()) {
-            recipes
-        } else {
-            recipes.filter {
-                it.title.contains(query, ignoreCase = true)
-            }
-        }
-
-        when (sort) {
-            SortOption.DATE_ADDED ->
-                filtered.sortedByDescending { it.dateAdded }
-
-            SortOption.DATE_MODIFIED ->
-                filtered.sortedByDescending { it.dateOpened }
-
-            SortOption.TITLE_ASC ->
-                filtered.sortedBy { it.title.lowercase() }
-
-            SortOption.TITLE_DESC ->
-                filtered.sortedByDescending { it.title.lowercase() }
-        }
-
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val isSelectionMode: StateFlow<Boolean> = selectedRecipeIds.map { it.isNotEmpty() }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     fun toggleSelection(recipeId: Long) {
         _selectedRecipeIds.update { current ->
@@ -73,11 +31,17 @@ class RecipeListViewModel : ViewModel() {
     fun deleteSelectedRecipes() {
         viewModelScope.launch {
             _selectedRecipeIds.value.forEach { id ->
-                recipeDao.deleteById(id)
+                Database.recipeDao.deleteById(id)
             }
             clearSelection()
         }
     }
+
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery
+
+    private val _sortOption = MutableStateFlow(SortOption.DATE_ADDED)
+    val sortOption: StateFlow<SortOption> = _sortOption
 
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
@@ -87,17 +51,31 @@ class RecipeListViewModel : ViewModel() {
         _sortOption.value = option
     }
 
-    suspend fun getSelectedExportRecipes(): List<ExportRecipe> {
-        return selectedRecipeIds.value.map { id ->
-            val recipe = recipeDao.getRecipeById(id)
-            val ingredients = ingredientSetDao.getIngredientsForRecipe(id)
+    val recipes: StateFlow<List<Recipe>> = combine(
+        Database.recipeDao.getAllRecipes(),
+        _searchQuery,
+        _sortOption
+    ) { recipes, query, sort ->
+        val filtered = if (query.isBlank()) recipes
+        else recipes.filter { it.title.contains(query, ignoreCase = true) }
+        when (sort) {
+            SortOption.DATE_ADDED -> filtered.sortedByDescending { it.dateAdded }
+            SortOption.DATE_MODIFIED -> filtered.sortedByDescending { it.dateOpened }
+            SortOption.TITLE_ASC -> filtered.sortedBy { it.title.lowercase() }
+            SortOption.TITLE_DESC -> filtered.sortedByDescending { it.title.lowercase() }
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    suspend fun getSelectedExportRecipes(): List<ExportRecipe> {
+        return _selectedRecipeIds.value.map { id ->
+            val recipe = Database.recipeDao.getRecipeById(id)
+            val ingredientSets = Database.ingredientSetDao.getIngredientsForRecipe(id)
             ExportRecipe(
                 title = recipe.title,
                 process = recipe.process,
                 notes = recipe.notes,
-                ingredients = ingredients.map {
-                    ExportIngredient(
+                ingredients = ingredientSets.map {
+                    com.ihita.wholetthemcook.data.ExportIngredient(
                         name = it.ingredient.title,
                         quantity = it.ingredientSet.quantity.toString(),
                         unit = it.ingredientSet.unit ?: "",
@@ -107,6 +85,4 @@ class RecipeListViewModel : ViewModel() {
             )
         }
     }
-
-
 }

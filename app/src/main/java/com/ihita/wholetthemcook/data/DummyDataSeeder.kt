@@ -1,3 +1,13 @@
+/**
+ * LOCAL-ONLY dummy data seeder.
+ *
+ * This seeds the Room database for:
+ * - first-time demo data
+ * - when ihita wants to reset
+ *
+ * This should NEVER be used for Firestore syncing.
+ */
+
 package com.ihita.wholetthemcook.data
 
 import kotlinx.coroutines.Dispatchers
@@ -81,11 +91,7 @@ object DummyDataSeeder {
         return database.recipeDao.insertAll(recipes)
     }
 
-    private suspend fun seedIngredientSets(
-        database: Database,
-        recipeIds: List<Long>,
-        ingredientIds: Map<String, Long>
-    ) {
+    private suspend fun seedIngredientSets(database: Database, recipeIds: List<Long>, ingredientIds: Map<String, Long>) {
         val sets = listOf(
             // Omelette
             IngredientSet(

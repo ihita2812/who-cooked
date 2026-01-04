@@ -37,11 +37,11 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
     val ingredients by infoViewModel.ingredients.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    val updated =
-        navController.currentBackStackEntry
-            ?.savedStateHandle
-            ?.getStateFlow("recipe_updated", false)
-            ?.collectAsState()
+//    val updated =
+//        navController.currentBackStackEntry
+//            ?.savedStateHandle
+//            ?.getStateFlow("recipe_updated", false)
+//            ?.collectAsState()
 
     val context = LocalContext.current
     val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
@@ -54,14 +54,14 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
         }
     }
 
-    LaunchedEffect(updated?.value) {
-        if (updated?.value == true) {
-            infoViewModel.reload()
-            navController.currentBackStackEntry
-                ?.savedStateHandle
-                ?.remove<Boolean>("recipe_updated")
-        }
-    }
+//    LaunchedEffect(updated?.value) {
+//        if (updated?.value == true) {
+//            infoViewModel.reload()
+//            navController.currentBackStackEntry
+//                ?.savedStateHandle
+//                ?.remove<Boolean>("recipe_updated")
+//        }
+//    }
 
 
     LaunchedEffect(isDeleted) {

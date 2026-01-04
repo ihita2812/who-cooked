@@ -2,10 +2,19 @@ package com.ihita.wholetthemcook.data
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Upsert
 
 @Dao
 interface IngredientDao {
+//    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
+    suspend fun insertOrUpdate(ingredient: Ingredient)
+
+    @Query("DELETE FROM Ingredient WHERE id = :id")
+    suspend fun deleteById(id: Long)
+
     @Insert
     suspend fun insertIngredient(ingredient: Ingredient): Long
 
