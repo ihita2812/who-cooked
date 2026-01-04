@@ -2,6 +2,7 @@ package com.ihita.wholetthemcook.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ihita.wholetthemcook.data.Database.ingredientSetDao
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +12,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 import com.ihita.wholetthemcook.data.Database.recipeDao
+import com.ihita.wholetthemcook.data.ExportIngredient
+import com.ihita.wholetthemcook.data.ExportRecipe
 import com.ihita.wholetthemcook.data.Recipe
 import com.ihita.wholetthemcook.ui.components.SortOption
 import kotlinx.coroutines.flow.combine
@@ -83,5 +86,27 @@ class RecipeListViewModel : ViewModel() {
     fun updateSortOption(option: SortOption) {
         _sortOption.value = option
     }
+
+    suspend fun getSelectedExportRecipes(): List<ExportRecipe> {
+        return selectedRecipeIds.value.map { id ->
+            val recipe = recipeDao.getRecipeById(id)
+            val ingredients = ingredientSetDao.getIngredientsForRecipe(id)
+
+            ExportRecipe(
+                title = recipe.title,
+                process = recipe.process,
+                notes = recipe.notes,
+                ingredients = ingredients.map {
+                    ExportIngredient(
+                        name = it.ingredient.title,
+                        quantity = it.ingredientSet.quantity.toString(),
+                        unit = it.ingredientSet.unit ?: "",
+                        notes = it.ingredientSet.notes ?: ""
+                    )
+                }
+            )
+        }
+    }
+
 
 }

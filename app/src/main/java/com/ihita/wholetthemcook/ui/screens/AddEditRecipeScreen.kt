@@ -11,15 +11,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
-import java.util.Date
 
 import com.ihita.wholetthemcook.data.Database
-import com.ihita.wholetthemcook.data.Recipe
 import com.ihita.wholetthemcook.data.RecipeRepository
-import com.ihita.wholetthemcook.ui.components.IngredientInput
+import com.ihita.wholetthemcook.data.ExportIngredient
 import com.ihita.wholetthemcook.ui.components.IngredientRow
 
 @Composable
@@ -28,7 +25,7 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
 
     // State for form fields
     var title by remember { mutableStateOf("") }
-    val ingredients = remember { mutableStateListOf<IngredientInput>() }
+    val ingredients = remember { mutableStateListOf<ExportIngredient>() }
     var processSteps = remember { mutableStateListOf<String>() }
     var notes by remember { mutableStateOf("") }
 
@@ -44,7 +41,7 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
             val ingredientRecipes = Database.ingredientSetDao.getIngredientsForRecipe(recipeId)
             ingredients.clear()
             ingredients.addAll(ingredientRecipes.map { ir ->
-                    IngredientInput(
+                    ExportIngredient(
                         name = ir.ingredient.title,
                         quantity = ir.ingredientSet.quantity?.toString() ?: "",
                         unit = ir.ingredientSet.unit ?: "",
@@ -53,7 +50,7 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
                 }
             )
             if (ingredients.isEmpty()) {
-                ingredients.add(IngredientInput(name =  "", quantity = "", unit = "", notes = ""))
+                ingredients.add(ExportIngredient(name =  "", quantity = "", unit = "", notes = ""))
             }
         }
     }
@@ -89,7 +86,7 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
                 }
             )
         }
-        TextButton(onClick = { ingredients.add(IngredientInput()) }) {
+        TextButton(onClick = { ingredients.add(ExportIngredient()) }) {
             Text("+ Add ingredient")
         }
 
@@ -145,7 +142,7 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
         Button(
             onClick = {
                 scope.launch {
-                    RecipeRepository.saveRecipeWithIngredients(recipeId, title, processSteps.map { it.trim() }.filter { it.isNotEmpty() }, notes, ingredients.map { IngredientInput(name = it.name.trim(), quantity = it.quantity.trim(), unit = it.unit.trim(), notes = it.notes.trim()) })
+                    RecipeRepository.saveRecipeWithIngredients(recipeId, title, processSteps.map { it.trim() }.filter { it.isNotEmpty() }, notes, ingredients.map { ExportIngredient(name = it.name.trim(), quantity = it.quantity?.trim(), unit = it.unit?.trim(), notes = it.notes?.trim()) })
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set("recipe_updated", true)

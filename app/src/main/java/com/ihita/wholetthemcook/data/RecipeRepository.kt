@@ -1,12 +1,10 @@
 package com.ihita.wholetthemcook.data
 
-import androidx.room.withTransaction
-import com.ihita.wholetthemcook.ui.components.IngredientInput
 import java.util.Date
 
 object RecipeRepository {
 
-    suspend fun saveRecipeWithIngredients(recipeId: Long?, title: String, process: List<String>, notes: String?, ingredients: List<IngredientInput>) {
+    suspend fun saveRecipeWithIngredients(recipeId: Long?, title: String, process: List<String>, notes: String?, ingredients: List<ExportIngredient>) {
 
         val id = if (recipeId == null) {
             Database.recipeDao.insertRecipe(
@@ -43,9 +41,9 @@ object RecipeRepository {
                 IngredientSet(
                     recipeId = id,
                     ingredientId = ingredientId,
-                    quantity = ingredientIn.quantity.toFloatOrNull(),
-                    unit = ingredientIn.unit.ifBlank { null },
-                    notes = ingredientIn.notes.ifBlank { null }
+                    quantity = ingredientIn.quantity?.toFloatOrNull(),
+                    unit = ingredientIn.unit,
+                    notes = ingredientIn.notes
                 )
             )
         }

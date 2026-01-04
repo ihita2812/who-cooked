@@ -7,7 +7,7 @@ TODO-
 - ~~ingredients formatting to recipe-add-edit-screen~~
 - ~~testing ingredient delete~~
 - ingredients quant float to int
-- export as pdf
+- ~~export as pdf~~
 - favourites
 - ~~process should be a list~~
 - add proper icons

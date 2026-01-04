@@ -11,7 +11,6 @@ import kotlinx.coroutines.launch
 import com.ihita.wholetthemcook.ui.theme.WhoLetThemCookTheme
 import com.ihita.wholetthemcook.navigation.WhoLetThemCookNavGraph
 import com.ihita.wholetthemcook.data.Database
-import com.ihita.wholetthemcook.data.DummyDataSeeder
 
 class MainActivity : ComponentActivity() {
 
@@ -20,12 +19,12 @@ class MainActivity : ComponentActivity() {
         Database.init(applicationContext)
 
         lifecycleScope.launch {
-            DummyDataSeeder.seed(Database)
+//            DummyDataSeeder.seed(Database)
         }
 
         enableEdgeToEdge()
         setContent {
-            WhoLetThemCookTheme() {
+            WhoLetThemCookTheme {
                 WhoLetThemCookNavGraph()
             }
         }

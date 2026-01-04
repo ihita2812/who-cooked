@@ -12,9 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardOptions
+import com.ihita.wholetthemcook.data.ExportIngredient
 
 @Composable
-fun IngredientRow(ingredient: IngredientInput, onChange: (IngredientInput) -> Unit, onDelete: () -> Unit) {
+fun IngredientRow(ingredient: ExportIngredient, onChange: (ExportIngredient) -> Unit, onDelete: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -31,7 +32,7 @@ fun IngredientRow(ingredient: IngredientInput, onChange: (IngredientInput) -> Un
         )
 
         TextField(
-            value = ingredient.quantity,
+            value = ingredient.quantity ?: "",
             onValueChange = { onChange(ingredient.copy(quantity = it)) },
             label = { Text("Qty") },
             modifier = Modifier.weight(0.15f),
@@ -40,7 +41,7 @@ fun IngredientRow(ingredient: IngredientInput, onChange: (IngredientInput) -> Un
         )
 
         TextField(
-            value = ingredient.unit,
+            value = ingredient.unit ?: "",
             onValueChange = { onChange(ingredient.copy(unit = it)) },
             label = { Text("Unit") },
             modifier = Modifier.weight(0.15f),
@@ -48,7 +49,7 @@ fun IngredientRow(ingredient: IngredientInput, onChange: (IngredientInput) -> Un
         )
 
         TextField(
-            value = ingredient.notes,
+            value = ingredient.notes ?: "",
             onValueChange = { onChange(ingredient.copy(notes = it)) },
             label = { Text("Notes") },
             modifier = Modifier.weight(0.3f),

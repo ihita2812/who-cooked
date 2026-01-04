@@ -1,5 +1,7 @@
 package com.ihita.wholetthemcook.ui.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -18,11 +20,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 
 import com.ihita.wholetthemcook.viewmodel.RecipeInfoViewModel
 import com.ihita.wholetthemcook.viewmodel.RecipeInfoViewModelFactory
 import com.ihita.wholetthemcook.navigation.Routes
+import com.ihita.wholetthemcook.ui.export.RecipePdfExporter
 
 @Composable
 fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
@@ -38,6 +42,17 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
             ?.savedStateHandle
             ?.getStateFlow("recipe_updated", false)
             ?.collectAsState()
+
+    val context = LocalContext.current
+    val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
+        uri?.let {
+            context.contentResolver.openOutputStream(it)?.use { out ->
+                infoViewModel.getExportRecipe()?.let { recipe ->
+                    RecipePdfExporter.export(listOf(recipe), out)
+                }
+            }
+        }
+    }
 
     LaunchedEffect(updated?.value) {
         if (updated?.value == true) {
@@ -89,7 +104,9 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
                             append(item.ingredientSet.quantity)
                             item.ingredientSet.unit?.let { append(" $it") }
                         }
-                        item.ingredientSet.notes?.let { append(" ($it)") }
+                        if (item.ingredientSet.notes != null && item.ingredientSet.notes != "") {
+                            append(" (${item.ingredientSet.notes})")
+                        }
                     }
                 )
             }
@@ -132,6 +149,10 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
 
             Button(onClick = { showDeleteDialog = true }) {
                 Text("Delete")
+            }
+
+            Button(onClick = { exportLauncher.launch("${recipe!!.title}.pdf") }) {
+                Text("Export PDF")
             }
         }
     }

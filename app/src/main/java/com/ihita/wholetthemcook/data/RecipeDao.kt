@@ -5,8 +5,6 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
-import java.util.Date
-import java.util.stream.DoubleStream.iterate
 
 @Dao
 interface RecipeDao {
@@ -17,7 +15,7 @@ interface RecipeDao {
     suspend fun insertAll(recipes: List<Recipe>): List<Long>
 
     @Query("SELECT * FROM Recipe ORDER BY id DESC")
-    fun getAllRecipes(): kotlinx.coroutines.flow.Flow<List<Recipe>>
+    fun getAllRecipes(): Flow<List<Recipe>>
 
     @Query("SELECT * FROM Recipe WHERE id = :recipeId")
     suspend fun getRecipeById(recipeId: Long): Recipe

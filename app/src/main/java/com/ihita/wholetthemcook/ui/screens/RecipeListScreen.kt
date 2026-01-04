@@ -1,6 +1,7 @@
 package com.ihita.wholetthemcook.ui.screens
 
-import android.text.Selection
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-//import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.filled.Add
@@ -36,9 +36,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -47,6 +49,8 @@ import com.ihita.wholetthemcook.navigation.Routes
 import com.ihita.wholetthemcook.viewmodel.RecipeListViewModel
 import com.ihita.wholetthemcook.data.Recipe
 import com.ihita.wholetthemcook.ui.components.SortOption
+import com.ihita.wholetthemcook.ui.export.RecipePdfExporter
+import kotlinx.coroutines.launch
 
 @Composable
 fun RecipeListScreen(navController: NavController) {
@@ -58,19 +62,32 @@ fun RecipeListScreen(navController: NavController) {
     val isSelectionMode by listViewModel.isSelectionMode.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
 
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
+        uri?.let {
+            scope.launch {
+                context.contentResolver.openOutputStream(it)?.use { out ->
+                    val recipes = listViewModel.getSelectedExportRecipes()
+                    RecipePdfExporter.export(recipes, out)
+                }
+            }
+        }
+    }
+
+
     Scaffold(
         topBar = {
             if (isSelectionMode) {
                 SelectionTopBar(
                     selectedCount = selectedIds.size,
-//                    onDelete = listViewModel::deleteSelectedRecipes,
                     onDelete = { showDeleteDialog = true },
                     onEdit = {
                         val id = selectedIds.first()
                         navController.navigate("${Routes.ROUTE_EDIT_RECIPE}/$id")
                         listViewModel.clearSelection()
                     },
-                    // onExport = /* TODO */,
+                    onExport = { exportLauncher.launch("recipes.pdf") },
                     onClearSelection = listViewModel::clearSelection
                 )
             } else {
@@ -141,7 +158,7 @@ fun RecipeListScreen(navController: NavController) {
 }
 
 @Composable
-fun SelectionTopBar(selectedCount: Int, onDelete: () -> Unit, onEdit: () -> Unit, onClearSelection: () -> Unit) {
+fun SelectionTopBar(selectedCount: Int, onDelete: () -> Unit, onEdit: () -> Unit, onExport: () -> Unit, onClearSelection: () -> Unit) {
 
     Row(
         modifier = Modifier
@@ -158,9 +175,9 @@ fun SelectionTopBar(selectedCount: Int, onDelete: () -> Unit, onEdit: () -> Unit
                 }
             }
 
-        //    Button(onClick = onExport) {
-        //        Text("Export")
-        //    }
+            Button(onClick = onExport) {
+                Text("Export")
+            }
 
             Button(onClick = onDelete) {
                 Text("Delete")
