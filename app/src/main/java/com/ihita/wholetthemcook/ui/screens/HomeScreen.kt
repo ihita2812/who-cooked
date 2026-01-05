@@ -22,7 +22,6 @@ fun HomeScreen(navController: NavHostController) {
         modifier = Modifier.fillMaxSize()
     ) {
 
-        // 🌸 Background texture
         Image(
             painter = painterResource(id = R.drawable.paper_texture),
             contentDescription = null,
@@ -32,7 +31,6 @@ fun HomeScreen(navController: NavHostController) {
             alpha = 0.35f
         )
 
-        // 🌷 Soft pink overlay to tint texture
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -41,7 +39,6 @@ fun HomeScreen(navController: NavHostController) {
                 )
         )
 
-        // ✨ Foreground content
         Column(
             modifier = Modifier
                 .fillMaxSize()
