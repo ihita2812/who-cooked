@@ -2,8 +2,10 @@ package com.ihita.wholetthemcook.firebase
 
 import com.google.firebase.firestore.*
 import com.ihita.wholetthemcook.data.*
+import com.ihita.wholetthemcook.firebase.model.FirestoreIngredientSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 object FirestoreListeners {
@@ -16,7 +18,13 @@ object FirestoreListeners {
     fun startListening() {
         listenRecipes()
         listenIngredients()
-        listenIngredientSets()
+        // listenIngredientSets()
+
+        // Delay IngredientSets slightly
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(1500)
+            listenIngredientSets()
+        }
     }
 
     fun stopListening() {
@@ -63,7 +71,7 @@ object FirestoreListeners {
                                 Database.ingredientDao.insertOrUpdate(ingredient)
                             }
                             DocumentChange.Type.REMOVED -> {
-                                ingredient.id?.let { Database.ingredientDao.deleteById(it) }
+                                ingredient.id.let { Database.ingredientDao.deleteById(it) }
                             }
                         }
                     }
@@ -73,25 +81,31 @@ object FirestoreListeners {
 
     // ------------------ IngredientSets ------------------
     private fun listenIngredientSets() {
-        ingredientSetsListener = db.collection("ingredientSets")
-            .addSnapshotListener { snapshot, error ->
-                if (error != null || snapshot == null) return@addSnapshotListener
+        ingredientSetsListener = db.collection("ingredientSets").addSnapshotListener { snapshot, error ->
 
-                CoroutineScope(Dispatchers.IO).launch {
-                    snapshot.documentChanges.forEach { change ->
-                        val set = change.document.toObject(IngredientSet::class.java)
-                        when (change.type) {
-                            DocumentChange.Type.ADDED,
-                            DocumentChange.Type.MODIFIED -> {
-                                Database.ingredientSetDao.insertOrUpdate(set)
-                            }
-                            DocumentChange.Type.REMOVED -> {
-                                // Room DAO method to delete by recipeId + ingredientId
-                                Database.ingredientSetDao.deleteByRecipeAndIngredient(set.recipeId, set.ingredientId)
-                            }
-                        }
+            if (error != null || snapshot == null) return@addSnapshotListener
+
+            CoroutineScope(Dispatchers.IO).launch {
+                snapshot.documentChanges.forEach { change ->
+//                    val set = change.document.toObject(IngredientSet::class.java)
+
+                    val firestoreSet = change.document.toObject(FirestoreIngredientSet::class.java)
+                    val roomSet = IngredientSet(
+                        recipeId = firestoreSet.recipeId,
+                        ingredientId = firestoreSet.ingredientId,
+                        quantity = firestoreSet.quantity,
+                        unit = firestoreSet.unit,
+                        notes = firestoreSet.notes
+                    )
+
+                    when (change.type) {
+                        DocumentChange.Type.ADDED,
+                        DocumentChange.Type.MODIFIED -> { Database.ingredientSetDao.insertOrUpdate(roomSet) }
+                        DocumentChange.Type.REMOVED -> { Database.ingredientSetDao.deleteByRecipeAndIngredient(roomSet.recipeId, roomSet.ingredientId) }
                     }
                 }
             }
+        }
     }
+
 }

@@ -5,6 +5,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -34,6 +36,7 @@ interface IngredientSetDao {
     fun getIngredientsForRecipeFlow(recipeId: Long): Flow<List<IngredientRecipe>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+//    @Upsert
     suspend fun insertOrUpdate(set: IngredientSet)
 
     @Query("DELETE FROM IngredientSet WHERE recipeId = :recipeId AND ingredientId = :ingredientId")

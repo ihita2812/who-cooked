@@ -2,34 +2,11 @@ package com.ihita.wholetthemcook.data
 
 import java.util.Date
 import com.ihita.wholetthemcook.firebase.FirestoreSync
+import com.ihita.wholetthemcook.firebase.model.FirestoreIngredientSet
 
 object RecipeRepository {
 
     suspend fun saveRecipeWithIngredients(recipeId: Long?, title: String, process: List<String>, notes: String?, ingredients: List<ExportIngredient>) {
-
-//        val id = if (recipeId == null) {
-//            Database.recipeDao.insertRecipe(
-//                Recipe(
-//                    title = title,
-//                    process = process,
-//                    notes = notes,
-//                    dateAdded = Date(),
-//                    dateOpened = Date()
-//                )
-//            )
-//        } else {
-//            Database.recipeDao.updateRecipe(
-//                Recipe(
-//                    id = recipeId,
-//                    title = title,
-//                    process = process,
-//                    notes = notes,
-//                    dateAdded = Database.recipeDao.getRecipeById(recipeId).dateAdded,
-//                    dateOpened = Date()
-//                )
-//            )
-//            recipeId
-//        }
 
         val recipe = if (recipeId == null) {
             val newId = Database.recipeDao.insertRecipe(
@@ -41,58 +18,69 @@ object RecipeRepository {
                     dateOpened = Date()
                 )
             )
-
-            Database.recipeDao.getRecipeById(newId)
+            val new = Database.recipeDao.getRecipeById(newId)
+            FirestoreSync.uploadRecipe(new)
+            new
         } else {
-            val updated = Recipe(
-                id = recipeId,
+            val existing = Database.recipeDao.getRecipeById(recipeId)
+            val updated = existing.copy(
                 title = title,
                 process = process,
                 notes = notes,
-                dateAdded = Database.recipeDao.getRecipeById(recipeId).dateAdded,
                 dateOpened = Date()
             )
-
             Database.recipeDao.updateRecipe(updated)
             updated
         }
-        FirestoreSync.uploadRecipe(recipe)
 
-        Database.ingredientSetDao.deleteForRecipe(recipe.id)
-        FirestoreSync.deleteIngredientSetsForRecipe(recipe.id)
+        val ingredientSets = ingredients
+            .filter { it.name.isNotBlank() }
+            .map { ingredientIn ->
 
-        ingredients.forEach { ingredientIn ->
-            if (ingredientIn.name.isBlank()) return@forEach
+                val ingredient = Database.ingredientDao.getByName(ingredientIn.name) ?: run {
+                    val newId = Database.ingredientDao.insertIngredient(Ingredient(title = ingredientIn.name))
+                    val new = Ingredient(id = newId, title = ingredientIn.name)
+                    FirestoreSync.uploadIngredient(new)
+                    new
+                }
 
-//            val ingredientId =
-//                Database.ingredientDao.getByName(ingredientIn.name)
-//                    ?.id ?: Database.ingredientDao.insertIngredient(Ingredient(title = ingredientIn.name))
-            val ingredient = Database.ingredientDao.getByName(ingredientIn.name) ?: run {
-                val newId = Database.ingredientDao.insertIngredient(Ingredient(title = ingredientIn.name))
-                Ingredient(id = newId, title = ingredientIn.name)
+                IngredientSet(
+                    recipeId = recipe.id,
+                    ingredientId = ingredient.id,
+                    quantity = ingredientIn.quantity?.toFloatOrNull(),
+                    unit = ingredientIn.unit,
+                    notes = ingredientIn.notes
+                )
             }
-            FirestoreSync.uploadIngredient(ingredient)
 
-//            Database.ingredientSetDao.insertIngredientSet(
-//                IngredientSet(
-//                    recipeId = id,
-//                    ingredientId = ingredientId,
-//                    quantity = ingredientIn.quantity?.toFloatOrNull(),
-//                    unit = ingredientIn.unit,
-//                    notes = ingredientIn.notes
-//                )
-//            )
+//        Database.getDb().runInTransaction {
+//            Database.ingredientSetDao.deleteForRecipe(recipe.id)
+//            Database.ingredientSetDao.insertAll(ingredientSets)
+//        }
 
-            val set = IngredientSet(
-                recipeId = recipe.id,
-                ingredientId = ingredient.id,
-                quantity = ingredientIn.quantity?.toFloatOrNull(),
-                unit = ingredientIn.unit,
-                notes = ingredientIn.notes
-            )
-            Database.ingredientSetDao.insertIngredientSet(set)
-            FirestoreSync.uploadIngredientSet(set)
+        Database.recipeTransactionDao.replaceIngredientsForRecipe(recipe, ingredientSets)
 
+        FirestoreSync.deleteIngredientSetsForRecipe(recipe.id)
+        ingredientSets.forEach { set ->
+//            FirestoreSync.uploadIngredientSet(set)
+            try {
+                FirestoreSync.uploadIngredientSet(
+                    FirestoreIngredientSet(
+                        id = set.id,
+                        recipeId = set.recipeId,
+                        ingredientId = set.ingredientId,
+                        quantity = set.quantity,
+                        unit = set.unit,
+                        notes = set.notes
+                    )
+                )
+            } catch (e: Exception) {
+                println("Error while firestore pushing ingredientset.")
+                println("${e}")
+                println("-------------------------------------------")
+                println("recipeid: ${set.recipeId}, ingredientid: ${set.ingredientId}")
+                println("-------------------------------------------")
+            }
         }
     }
 }

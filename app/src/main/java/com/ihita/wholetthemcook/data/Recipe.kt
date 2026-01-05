@@ -7,9 +7,9 @@ import java.util.Date
 @Entity
 data class Recipe(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val title: String,
-    val dateAdded: Date,
-    val dateOpened: Date,
+    val title: String = "",
+    val dateAdded: Date = Date(),
+    val dateOpened: Date = Date(),
     val process: List<String> = emptyList(),
     val notes: String? = null
 )

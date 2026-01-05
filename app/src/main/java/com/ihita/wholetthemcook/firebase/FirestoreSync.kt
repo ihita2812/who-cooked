@@ -6,6 +6,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.ihita.wholetthemcook.data.Ingredient
 import com.ihita.wholetthemcook.data.IngredientSet
 import com.ihita.wholetthemcook.data.Recipe
+import com.ihita.wholetthemcook.firebase.model.FirestoreIngredientSet
 
 object FirestoreSync {
 
@@ -23,7 +24,7 @@ object FirestoreSync {
             .set(ingredient)
     }
 
-    fun uploadIngredientSet(set: IngredientSet) {
+    fun uploadIngredientSet(set: FirestoreIngredientSet) {
         db.collection("ingredientSets").add(
             mapOf(
                 "recipeId" to set.recipeId,

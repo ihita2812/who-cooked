@@ -21,4 +21,6 @@ object Database {
         get() = getDb().ingredientDao()
     val ingredientSetDao: IngredientSetDao
         get() = getDb().ingredientSetDao()
+    val recipeTransactionDao: RecipeTransactionDao
+        get() = getDb().recipeTransactionDao()
 }
