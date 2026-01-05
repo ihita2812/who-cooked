@@ -26,10 +26,6 @@ class MainActivity : ComponentActivity() {
         try {
             super.onCreate(savedInstanceState)
 
-            //        lifecycleScope.launch {
-            //            DummyDataSeeder.seed(Database)
-            //        }
-
             enableEdgeToEdge()
             setContent {
                 WhoLetThemCookTheme {
@@ -38,15 +34,14 @@ class MainActivity : ComponentActivity() {
             }
 
             FirebaseApp.initializeApp(this)
-//            FirebaseFirestore.getInstance().clearPersistence()
-            val settings = FirebaseFirestoreSettings.Builder()
-                .setLocalCacheSettings(
-                    MemoryCacheSettings.newBuilder()
-                        .build()
-                )
-                .build()
-
-            FirebaseFirestore.getInstance().firestoreSettings = settings
+////            FirebaseFirestore.getInstance().clearPersistence()
+//            val settings = FirebaseFirestoreSettings.Builder()
+//                .setLocalCacheSettings(
+//                    MemoryCacheSettings.newBuilder()
+//                        .build()
+//                )
+//                .build()
+//            FirebaseFirestore.getInstance().firestoreSettings = settings
 
 
             FirebaseAuthManager.signInAnonymously { success, _ ->
