@@ -14,24 +14,20 @@ import androidx.compose.ui.unit.dp
 import com.ihita.wholetthemcook.R
 
 @Composable
-fun PaperScreen(
-    content: @Composable BoxScope.() -> Unit
-) {
+fun PaperScreen(content: @Composable BoxScope.() -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp) // outer breathing space
+            .padding(16.dp)
     ) {
 
-        // --- Paper container ---
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .clip(RoundedCornerShape(28.dp))
         ) {
 
-            // Crumpled paper texture
             Image(
                 painter = painterResource(id = R.drawable.paper_texture),
                 contentDescription = null,
@@ -40,7 +36,6 @@ fun PaperScreen(
                 alpha = 0.45f
             )
 
-            // Soft lilac / pink tint
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -49,8 +44,6 @@ fun PaperScreen(
                     )
             )
 
-            // 🌸 FUN BACKGROUND DECOR (very subtle for now)
-            // You can later replace these with stickers, doodles, text, etc.
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -59,11 +52,10 @@ fun PaperScreen(
                     )
             )
 
-            // --- Actual screen content ---
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp) // inner safe padding
+                    .padding(24.dp)
             ) {
                 content()
             }

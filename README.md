@@ -17,7 +17,7 @@ Android app for the recipes of 401.
 - add dark/light/system mode
 
 ## UI todo-
-- home screen add their pics
+- ~~home screen add their pics~~
 - typography
 - ~~pink consistency for all screens~~
 - refactoring of colors
