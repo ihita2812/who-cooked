@@ -7,11 +7,19 @@ Android app for the recipes of 401.
 - ~~ingredients formatting to recipe-add-edit-screen~~
 - ~~testing ingredient delete~~
 - ingredients quant float to int
-- ingredients efit formatting
+- ~~ingredients efit formatting~~
 - ~~export as pdf~~
 - favourites
 - ~~process should be a list~~
 - add proper icons
 - images section
+- design copy to export as pdf
+- add dark/light/system mode
 
 ## UI todo-
+- home screen add their pics
+- typography
+- pink consistency for all screens
+- refactoring of colors
+- dark mode
+- experiment w colours
