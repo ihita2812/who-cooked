@@ -3,7 +3,6 @@ package com.ihita.wholetthemcook.ui.screens
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -18,15 +17,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.ihita.wholetthemcook.R
 import com.ihita.wholetthemcook.data.Recipe
 import com.ihita.wholetthemcook.navigation.Routes
+import com.ihita.wholetthemcook.ui.components.PaperScreen
 import com.ihita.wholetthemcook.ui.components.SortOption
 import com.ihita.wholetthemcook.ui.export.RecipePdfExporter
 import com.ihita.wholetthemcook.viewmodel.RecipeListViewModel
@@ -44,34 +41,21 @@ fun RecipeListScreen(navController: NavController) {
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
-        uri?.let {
-            scope.launch {
-                context.contentResolver.openOutputStream(it)?.use { out ->
-                    val recipes = listViewModel.getSelectedExportRecipes()
-                    RecipePdfExporter.export(recipes, out)
+    val exportLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
+            uri?.let {
+                scope.launch {
+                    context.contentResolver.openOutputStream(it)?.use { out ->
+                        RecipePdfExporter.export(
+                            listViewModel.getSelectedExportRecipes(),
+                            out
+                        )
+                    }
                 }
             }
         }
-    }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-
-        Image(
-            painter = painterResource(id = R.drawable.paper_texture),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-            alpha = 0.3f
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    MaterialTheme.colorScheme.secondary.copy(alpha = 0.12f)
-                )
-        )
+    PaperScreen {
 
         Scaffold(
             containerColor = Color.Transparent,
@@ -113,8 +97,8 @@ fun RecipeListScreen(navController: NavController) {
             LazyColumn(
                 modifier = Modifier
                     .padding(padding)
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                    .padding(horizontal = 8.dp), // respects paper border
+                verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 items(recipes) { recipe ->
                     RecipeRow(
@@ -149,10 +133,7 @@ fun RecipeListScreen(navController: NavController) {
                         listViewModel.deleteSelectedRecipes()
                     }
                 ) {
-                    Text(
-                        "Delete",
-                        color = MaterialTheme.colorScheme.error
-                    )
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
@@ -164,21 +145,30 @@ fun RecipeListScreen(navController: NavController) {
     }
 }
 
+/* -------------------- TOP BARS -------------------- */
+
 @Composable
-fun SelectionTopBar(selectedCount: Int, onDelete: () -> Unit, onEdit: () -> Unit, onExport: () -> Unit, onClearSelection: () -> Unit) {
+fun SelectionTopBar(
+    selectedCount: Int,
+    onDelete: () -> Unit,
+    onEdit: () -> Unit,
+    onExport: () -> Unit,
+    onClearSelection: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp),
+            .padding(horizontal = 12.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             "$selectedCount selected",
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.85f)
         )
 
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             if (selectedCount == 1) {
                 TextButton(onClick = onEdit) { Text("Edit") }
             }
@@ -191,13 +181,17 @@ fun SelectionTopBar(selectedCount: Int, onDelete: () -> Unit, onEdit: () -> Unit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DefaultTopBar(searchQuery: String, onSearchChange: (String) -> Unit, onSortSelected: (SortOption) -> Unit) {
+fun DefaultTopBar(
+    searchQuery: String,
+    onSearchChange: (String) -> Unit,
+    onSortSelected: (SortOption) -> Unit
+) {
     var showSortMenu by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -207,8 +201,7 @@ fun DefaultTopBar(searchQuery: String, onSearchChange: (String) -> Unit, onSortS
             onValueChange = onSearchChange,
             placeholder = { Text("Search recipes") },
             singleLine = true,
-            modifier = Modifier
-                .weight(1f),
+            modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(16.dp),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
@@ -224,50 +217,63 @@ fun DefaultTopBar(searchQuery: String, onSearchChange: (String) -> Unit, onSortS
                 modifier = Modifier
                     .background(
                         MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
-                        shape = RoundedCornerShape(14.dp)
+                        RoundedCornerShape(14.dp)
                     )
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Sort,
-                    contentDescription = "Sort"
-                )
+                Icon(Icons.Filled.Sort, contentDescription = "Sort")
             }
 
             DropdownMenu(
                 expanded = showSortMenu,
                 onDismissRequest = { showSortMenu = false }
             ) {
-                DropdownMenuItem(text = { Text("Date added") }, onClick = {
-                    onSortSelected(SortOption.DATE_ADDED)
-                    showSortMenu = false
-                })
-                DropdownMenuItem(text = { Text("Date modified") }, onClick = {
-                    onSortSelected(SortOption.DATE_MODIFIED)
-                    showSortMenu = false
-                })
-                DropdownMenuItem(text = { Text("A → Z") }, onClick = {
-                    onSortSelected(SortOption.TITLE_ASC)
-                    showSortMenu = false
-                })
-                DropdownMenuItem(text = { Text("Z → A") }, onClick = {
-                    onSortSelected(SortOption.TITLE_DESC)
-                    showSortMenu = false
-                })
+                DropdownMenuItem(
+                    text = { Text("Date added") },
+                    onClick = {
+                        onSortSelected(SortOption.DATE_ADDED)
+                        showSortMenu = false
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Date modified") },
+                    onClick = {
+                        onSortSelected(SortOption.DATE_MODIFIED)
+                        showSortMenu = false
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("A → Z") },
+                    onClick = {
+                        onSortSelected(SortOption.TITLE_ASC)
+                        showSortMenu = false
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Z → A") },
+                    onClick = {
+                        onSortSelected(SortOption.TITLE_DESC)
+                        showSortMenu = false
+                    }
+                )
             }
         }
     }
 }
 
+/* -------------------- RECIPE ROW -------------------- */
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun RecipeRow(recipe: Recipe, isSelected: Boolean, onClick: () -> Unit, onLongClick: () -> Unit) {
+fun RecipeRow(
+    recipe: Recipe,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick
-            )
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
             .background(
                 if (isSelected)
                     MaterialTheme.colorScheme.secondary.copy(alpha = 0.22f)
@@ -279,7 +285,7 @@ fun RecipeRow(recipe: Recipe, isSelected: Boolean, onClick: () -> Unit, onLongCl
         Text(
             text = recipe.title,
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f)
         )
 
         Spacer(modifier = Modifier.height(10.dp))

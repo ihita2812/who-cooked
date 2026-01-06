@@ -2,7 +2,6 @@ package com.ihita.wholetthemcook.ui.screens
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,16 +11,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-
-import com.ihita.wholetthemcook.R
 import com.ihita.wholetthemcook.navigation.Routes
+import com.ihita.wholetthemcook.ui.components.PaperScreen
 import com.ihita.wholetthemcook.ui.export.RecipePdfExporter
 import com.ihita.wholetthemcook.viewmodel.RecipeInfoViewModel
 import com.ihita.wholetthemcook.viewmodel.RecipeInfoViewModelFactory
@@ -40,7 +35,9 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
     val context = LocalContext.current
 
     val exportLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.CreateDocument("application/pdf")
+        ) { uri ->
             uri?.let {
                 context.contentResolver.openOutputStream(it)?.use { out ->
                     infoViewModel.getExportRecipe()?.let { recipe ->
@@ -54,44 +51,33 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
         if (isDeleted) navController.popBackStack()
     }
 
-    if (recipe == null) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Loading recipe…",
-                color = Color(0xFF4A453F)
-            )
+    val bodyTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.88f)
+    val accentUnderline = MaterialTheme.colorScheme.primary.copy(alpha = 0.45f)
+
+    PaperScreen {
+
+        if (recipe == null) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Loading recipe…",
+                    color = bodyTextColor
+                )
+            }
+            return@PaperScreen
         }
-        return
-    }
-
-    val bodyTextColor = Color(0xFF3E3A36)
-    val accentUnderline = Color(0xFFD6B7E2)
-
-    Box(modifier = Modifier.fillMaxSize()) {
-
-        Image(
-            painter = painterResource(id = R.drawable.paper_texture),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFFF4EDE8).copy(alpha = 0.35f))
-        )
 
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp, vertical = 32.dp)
+                .padding(horizontal = 8.dp), // respects paper border
+            contentPadding = PaddingValues(vertical = 28.dp)
         ) {
 
-            // Title
+            /* ---------- TITLE ---------- */
+
             item {
                 Text(
                     text = recipe!!.title,
@@ -99,28 +85,29 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
                     color = bodyTextColor
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Box(
                     modifier = Modifier
-                        .width(72.dp)
+                        .width(80.dp)
                         .height(3.dp)
                         .background(
-                            color = accentUnderline.copy(alpha = 0.6f),
+                            color = accentUnderline,
                             shape = MaterialTheme.shapes.small
                         )
                 )
 
-                Spacer(modifier = Modifier.height(28.dp))
+                Spacer(modifier = Modifier.height(36.dp))
             }
 
-            // Ingredients
+            /* ---------- INGREDIENTS ---------- */
+
             item {
                 Text(
                     text = "Ingredients",
                     style = MaterialTheme.typography.titleMedium,
                     color = bodyTextColor,
-                    modifier = Modifier.padding(bottom = 12.dp)
+                    modifier = Modifier.padding(bottom = 14.dp)
                 )
             }
 
@@ -140,76 +127,89 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
                             ?.takeIf { it.isNotBlank() }
                             ?.let { append(" ($it)") }
                     },
-                    color = bodyTextColor.copy(alpha = 0.9f),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(bottom = 6.dp)
-                )
-            }
-
-            item { Spacer(modifier = Modifier.height(32.dp)) }
-
-            // Process
-            item {
-                Text(
-                    text = "Process",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = bodyTextColor,
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
-            }
-
-            itemsIndexed(recipe!!.process) { index, step ->
-                Text(
-                    text = "${index + 1}. $step",
                     color = bodyTextColor.copy(alpha = 0.95f),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
             }
 
+            item { Spacer(modifier = Modifier.height(40.dp)) }
+
+            /* ---------- PROCESS ---------- */
+
+            item {
+                Text(
+                    text = "Process",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = bodyTextColor,
+                    modifier = Modifier.padding(bottom = 14.dp)
+                )
+            }
+
+            itemsIndexed(recipe!!.process) { index, step ->
+                Text(
+                    text = "${index + 1}. $step",
+                    color = bodyTextColor,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 10.dp)
+                )
+            }
+
+            /* ---------- NOTES ---------- */
+
             if (!recipe!!.notes.isNullOrBlank()) {
-                item { Spacer(modifier = Modifier.height(32.dp)) }
+                item { Spacer(modifier = Modifier.height(40.dp)) }
 
                 item {
                     Text(
                         text = "Notes",
                         style = MaterialTheme.typography.titleMedium,
                         color = bodyTextColor,
-                        modifier = Modifier.padding(bottom = 12.dp)
+                        modifier = Modifier.padding(bottom = 14.dp)
                     )
                 }
 
                 item {
                     Text(
                         text = recipe!!.notes!!,
-                        color = bodyTextColor.copy(alpha = 0.9f),
+                        color = bodyTextColor.copy(alpha = 0.95f),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
 
-            item { Spacer(modifier = Modifier.height(40.dp)) }
+            item { Spacer(modifier = Modifier.height(48.dp)) }
 
-            // Actions
+            /* ---------- ACTIONS ---------- */
+
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Button(onClick = {
-                        navController.navigate("${Routes.ROUTE_EDIT_RECIPE}/$recipeId")
-                    }) {
+                    Button(
+                        onClick = {
+                            navController.navigate("${Routes.ROUTE_EDIT_RECIPE}/$recipeId")
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
                         Text("Edit")
                     }
 
-                    Button(onClick = { showDeleteDialog = true }) {
+                    Button(
+                        onClick = { showDeleteDialog = true },
+                        modifier = Modifier.weight(1f)
+                    ) {
                         Text("Delete")
                     }
 
-                    Button(onClick = {
-                        exportLauncher.launch("${recipe!!.title}.pdf")
-                    }) {
-                        Text("Export PDF")
+                    Button(
+                        onClick = {
+                            exportLauncher.launch("${recipe!!.title}.pdf")
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Export")
                     }
                 }
             }
@@ -227,7 +227,9 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
                         showDeleteDialog = false
                         infoViewModel.deleteRecipe()
                     }
-                ) { Text("Delete") }
+                ) {
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {

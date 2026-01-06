@@ -19,7 +19,10 @@ Android app for the recipes of 401.
 ## UI todo-
 - home screen add their pics
 - typography
-- pink consistency for all screens
+- ~~pink consistency for all screens~~
 - refactoring of colors
 - dark mode
 - experiment w colours
+- ~~basic border~~
+- fun border
+- `recipe-list` : selection top bar iconify

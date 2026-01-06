@@ -1,6 +1,5 @@
 package com.ihita.wholetthemcook.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,19 +12,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 
-import com.ihita.wholetthemcook.R
 import com.ihita.wholetthemcook.data.Database
-import com.ihita.wholetthemcook.data.RecipeRepository
 import com.ihita.wholetthemcook.data.ExportIngredient
+import com.ihita.wholetthemcook.data.RecipeRepository
 import com.ihita.wholetthemcook.ui.components.IngredientRow
+import com.ihita.wholetthemcook.ui.components.PaperScreen
 
 @Composable
 fun AddEditRecipeScreen(
@@ -33,14 +29,13 @@ fun AddEditRecipeScreen(
     recipeId: Long? = null
 ) {
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
 
     var title by remember { mutableStateOf("") }
     val ingredients = remember { mutableStateListOf<ExportIngredient>() }
     val processSteps = remember { mutableStateListOf("") }
     var notes by remember { mutableStateOf("") }
 
-    val inkColor = Color(0xFF3E3A36)
+    val inkColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f)
 
     LaunchedEffect(recipeId) {
         if (recipeId != null) {
@@ -73,50 +68,59 @@ fun AddEditRecipeScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-
-        // Paper background
-        Image(
-            painter = painterResource(id = R.drawable.paper_texture),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFFF4EDE8).copy(alpha = 0.35f))
-        )
+    PaperScreen {
 
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp, vertical = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+                .padding(horizontal = 8.dp),
+            contentPadding = PaddingValues(vertical = 28.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
 
-            // Screen title
+            /* ---------- SCREEN TITLE ---------- */
+
             item {
                 Text(
                     text = if (recipeId == null) "New Recipe" else "Edit Recipe",
                     style = MaterialTheme.typography.headlineMedium,
                     color = inkColor
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Box(
+                    modifier = Modifier
+                        .width(64.dp)
+                        .height(3.dp)
+                        .background(
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.45f),
+                            shape = MaterialTheme.shapes.small
+                        )
+                )
             }
 
-            // Recipe title input
+            /* ---------- RECIPE TITLE ---------- */
+
             item {
                 TextField(
                     value = title,
                     onValueChange = { title = it },
                     placeholder = { Text("Recipe title") },
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.65f),
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    shape = MaterialTheme.shapes.large
                 )
             }
 
-            // Ingredients
+            /* ---------- INGREDIENTS ---------- */
+
             item {
                 Text(
                     text = "Ingredients",
@@ -151,7 +155,8 @@ fun AddEditRecipeScreen(
                 }
             }
 
-            // Process
+            /* ---------- PROCESS ---------- */
+
             item {
                 Text(
                     text = "Process",
@@ -163,7 +168,7 @@ fun AddEditRecipeScreen(
             itemsIndexed(processSteps) { index, step ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -176,7 +181,14 @@ fun AddEditRecipeScreen(
                         value = step,
                         onValueChange = { processSteps[index] = it },
                         placeholder = { Text("Step ${index + 1}") },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        shape = MaterialTheme.shapes.large
                     )
 
                     IconButton(
@@ -201,7 +213,8 @@ fun AddEditRecipeScreen(
                 }
             }
 
-            // Notes
+            /* ---------- NOTES ---------- */
+
             item {
                 Text(
                     text = "Notes",
@@ -215,11 +228,19 @@ fun AddEditRecipeScreen(
                     value = notes,
                     onValueChange = { notes = it },
                     placeholder = { Text("Optional notes…") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    shape = MaterialTheme.shapes.large
                 )
             }
 
-            // Actions
+            /* ---------- ACTIONS ---------- */
+
             item {
                 Spacer(modifier = Modifier.height(12.dp))
             }
