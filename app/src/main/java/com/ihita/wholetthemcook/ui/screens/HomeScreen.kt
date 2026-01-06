@@ -5,7 +5,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -14,6 +13,7 @@ import com.ihita.wholetthemcook.R
 import com.ihita.wholetthemcook.navigation.Routes
 import com.ihita.wholetthemcook.ui.components.AnimateImage
 import com.ihita.wholetthemcook.ui.components.PaperScreen
+import com.ihita.wholetthemcook.ui.theme.*
 
 @Composable
 fun HomeScreen(navController: NavHostController) {
@@ -52,34 +52,41 @@ fun HomeScreen(navController: NavHostController) {
                     )
 
                     Text(
+                        modifier = Modifier.padding(top = 12.dp),
                         text = "Who Cooked?",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = Color(0xFF440FA4)
+                        style = MaterialTheme.typography.titleLarge,
+                        color = DarkPurple
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "for the recipes of 401",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF6B645C)
+                    text = "FOR THE RECIPES OF 401",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = LighterPurple
                 )
 
-                Spacer(modifier = Modifier.height(36.dp))
+                Spacer(modifier = Modifier.height(40.dp))
 
                 Button(
                     onClick = { navController.navigate(Routes.RECIPE_LIST) },
                     shape = MaterialTheme.shapes.extraLarge,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ButtonPrimary
+                    ),
                     contentPadding = PaddingValues(
-                        horizontal = 28.dp,
+                        horizontal = 32.dp,
                         vertical = 14.dp
                     )
                 ) {
-                    Text("View recipes")
+                    Text(
+                        text = "View recipes",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = ButtonText
+                    )
                 }
             }
         }
-
     }
 }

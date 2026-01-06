@@ -5,8 +5,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,17 +17,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+
 import com.ihita.wholetthemcook.navigation.Routes
 import com.ihita.wholetthemcook.ui.components.PaperScreen
 import com.ihita.wholetthemcook.ui.export.RecipePdfExporter
 import com.ihita.wholetthemcook.viewmodel.RecipeInfoViewModel
 import com.ihita.wholetthemcook.viewmodel.RecipeInfoViewModelFactory
+import com.ihita.wholetthemcook.ui.theme.*
 
 @Composable
 fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
 
-    val infoViewModel: RecipeInfoViewModel =
-        viewModel(factory = RecipeInfoViewModelFactory(recipeId))
+    val infoViewModel: RecipeInfoViewModel = viewModel(factory = RecipeInfoViewModelFactory(recipeId))
 
     val recipe by infoViewModel.recipe.collectAsState()
     val ingredients by infoViewModel.ingredients.collectAsState()
@@ -34,25 +37,19 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
 
     val context = LocalContext.current
 
-    val exportLauncher =
-        rememberLauncherForActivityResult(
-            ActivityResultContracts.CreateDocument("application/pdf")
-        ) { uri ->
-            uri?.let {
-                context.contentResolver.openOutputStream(it)?.use { out ->
-                    infoViewModel.getExportRecipe()?.let { recipe ->
-                        RecipePdfExporter.export(listOf(recipe), out)
-                    }
+    val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
+        uri?.let {
+            context.contentResolver.openOutputStream(it)?.use { out ->
+                infoViewModel.getExportRecipe()?.let { recipe ->
+                    RecipePdfExporter.export(listOf(recipe), out)
                 }
             }
         }
+    }
 
     LaunchedEffect(isDeleted) {
         if (isDeleted) navController.popBackStack()
     }
-
-    val bodyTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.88f)
-    val accentUnderline = MaterialTheme.colorScheme.primary.copy(alpha = 0.45f)
 
     PaperScreen {
 
@@ -62,8 +59,9 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Loading recipe…",
-                    color = bodyTextColor
+                    text = "Loading…",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextBody
                 )
             }
             return@PaperScreen
@@ -72,168 +70,192 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 8.dp), // respects paper border
-            contentPadding = PaddingValues(vertical = 28.dp)
+                .padding(horizontal = 8.dp),
+            contentPadding = PaddingValues(vertical = 28.dp),
+            verticalArrangement = Arrangement.spacedBy(26.dp)
         ) {
 
-            /* ---------- TITLE ---------- */
-
             item {
-                Text(
-                    text = recipe!!.title,
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = bodyTextColor
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Top
+                ) {
 
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Box(
-                    modifier = Modifier
-                        .width(80.dp)
-                        .height(3.dp)
-                        .background(
-                            color = accentUnderline,
-                            shape = MaterialTheme.shapes.small
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = recipe!!.title,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = DarkPurple
                         )
-                )
 
-                Spacer(modifier = Modifier.height(36.dp))
-            }
+                        Spacer(modifier = Modifier.height(12.dp))
 
-            /* ---------- INGREDIENTS ---------- */
+                        Box(
+                            modifier = Modifier
+                                .width(72.dp)
+                                .height(3.dp)
+                                .background(
+                                    LighterPurple.copy(alpha = 0.45f),
+                                    shape = MaterialTheme.shapes.small
+                                )
+                        )
+                    }
 
-            item {
-                Text(
-                    text = "Ingredients",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = bodyTextColor,
-                    modifier = Modifier.padding(bottom = 14.dp)
-                )
-            }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
 
-            items(ingredients) { item ->
-                Text(
-                    text = buildString {
-                        append("• ")
-                        append(item.ingredient.title)
-                        item.ingredientSet.quantity?.let {
-                            append(" – ")
-                            append(it)
-                            item.ingredientSet.unit?.let { unit ->
-                                append(" $unit")
+                        IconButton(
+                            onClick = {
+                                navController.navigate(
+                                    "${Routes.ROUTE_EDIT_RECIPE}/$recipeId"
+                                )
                             }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit recipe",
+                                tint = TextBody
+                            )
                         }
-                        item.ingredientSet.notes
-                            ?.takeIf { it.isNotBlank() }
-                            ?.let { append(" ($it)") }
-                    },
-                    color = bodyTextColor.copy(alpha = 0.95f),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
+
+                        IconButton(
+                            onClick = {
+                                exportLauncher.launch("${recipe!!.title}.pdf")
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Share,
+                                contentDescription = "Export recipe",
+                                tint = TextBody
+                            )
+                        }
+
+                        IconButton(
+                            onClick = { showDeleteDialog = true }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete recipe",
+                                tint = TextBody
+                            )
+                        }
+                    }
+                }
             }
-
-            item { Spacer(modifier = Modifier.height(40.dp)) }
-
-            /* ---------- PROCESS ---------- */
 
             item {
                 Text(
-                    text = "Process",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = bodyTextColor,
-                    modifier = Modifier.padding(bottom = 14.dp)
+                    text = "INGREDIENTS",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = LighterPurple
                 )
             }
 
-            itemsIndexed(recipe!!.process) { index, step ->
+            item {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    ingredients.forEach { item ->
+                        Text(
+                            text = buildString {
+                                append("• ")
+                                append(item.ingredient.title)
+                                item.ingredientSet.quantity?.let {
+                                    append(" – $it")
+                                    item.ingredientSet.unit?.let { unit ->
+                                        append(" $unit")
+                                    }
+                                }
+                                item.ingredientSet.notes
+                                    ?.takeIf { it.isNotBlank() }
+                                    ?.let { append(" ($it)") }
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = TextBody
+                        )
+                    }
+                }
+            }
+
+            item {
                 Text(
-                    text = "${index + 1}. $step",
-                    color = bodyTextColor,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(bottom = 10.dp)
+                    text = "PROCESS",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = LighterPurple
                 )
             }
 
-            /* ---------- NOTES ---------- */
+            item {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    recipe!!.process.forEachIndexed { index, step ->
+                        Text(
+                            text = "${index + 1}. $step",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = TextBody
+                        )
+                    }
+                }
+            }
 
             if (!recipe!!.notes.isNullOrBlank()) {
-                item { Spacer(modifier = Modifier.height(40.dp)) }
-
                 item {
                     Text(
-                        text = "Notes",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = bodyTextColor,
-                        modifier = Modifier.padding(bottom = 14.dp)
+                        text = "NOTES",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = LighterPurple
                     )
                 }
 
                 item {
                     Text(
                         text = recipe!!.notes!!,
-                        color = bodyTextColor.copy(alpha = 0.95f),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextBody
                     )
                 }
             }
 
-            item { Spacer(modifier = Modifier.height(48.dp)) }
-
-            /* ---------- ACTIONS ---------- */
-
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Button(
-                        onClick = {
-                            navController.navigate("${Routes.ROUTE_EDIT_RECIPE}/$recipeId")
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Edit")
-                    }
-
-                    Button(
-                        onClick = { showDeleteDialog = true },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Delete")
-                    }
-
-                    Button(
-                        onClick = {
-                            exportLauncher.launch("${recipe!!.title}.pdf")
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Export")
-                    }
-                }
-            }
+            item { Spacer(modifier = Modifier.height(40.dp)) }
         }
     }
 
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete recipe?") },
-            text = { Text("Are you sure you want to delete \"${recipe!!.title}\"?") },
+            title = {
+                Text(
+                    text = "Delete recipe?",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = DarkPurple
+                )
+            },
+            text = {
+                Text(
+                    text = "Are you sure you want to delete \"${recipe!!.title}\"?",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextBody
+                )
+            },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        showDeleteDialog = false
-                        infoViewModel.deleteRecipe()
-                    }
-                ) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                TextButton(onClick = {
+                    showDeleteDialog = false
+                    infoViewModel.deleteRecipe()
+                }) {
+                    Text(
+                        text = "Delete",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text(
+                        text = "Cancel",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = TextBody
+                    )
                 }
             }
         )
