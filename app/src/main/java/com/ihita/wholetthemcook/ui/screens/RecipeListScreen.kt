@@ -57,7 +57,6 @@ fun RecipeListScreen(navController: NavController) {
 
     Box(modifier = Modifier.fillMaxSize()) {
 
-        /* 🌸 Background texture */
         Image(
             painter = painterResource(id = R.drawable.paper_texture),
             contentDescription = null,
@@ -66,7 +65,6 @@ fun RecipeListScreen(navController: NavController) {
             alpha = 0.3f
         )
 
-        /* 🌷 Soft pink tint overlay */
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -166,16 +164,8 @@ fun RecipeListScreen(navController: NavController) {
     }
 }
 
-/* 🌸 Selection Top Bar */
-
 @Composable
-fun SelectionTopBar(
-    selectedCount: Int,
-    onDelete: () -> Unit,
-    onEdit: () -> Unit,
-    onExport: () -> Unit,
-    onClearSelection: () -> Unit
-) {
+fun SelectionTopBar(selectedCount: Int, onDelete: () -> Unit, onEdit: () -> Unit, onExport: () -> Unit, onClearSelection: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -199,15 +189,9 @@ fun SelectionTopBar(
     }
 }
 
-/* 🌷 Default Top Bar */
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DefaultTopBar(
-    searchQuery: String,
-    onSearchChange: (String) -> Unit,
-    onSortSelected: (SortOption) -> Unit
-) {
+fun DefaultTopBar(searchQuery: String, onSearchChange: (String) -> Unit, onSortSelected: (SortOption) -> Unit) {
     var showSortMenu by remember { mutableStateOf(false) }
 
     Row(
@@ -218,7 +202,6 @@ fun DefaultTopBar(
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
 
-        // 🌸 Search field (embedded, paper-friendly)
         TextField(
             value = searchQuery,
             onValueChange = onSearchChange,
@@ -235,7 +218,6 @@ fun DefaultTopBar(
             )
         )
 
-        // 🌷 Sort button
         Box {
             IconButton(
                 onClick = { showSortMenu = true },
@@ -276,16 +258,9 @@ fun DefaultTopBar(
     }
 }
 
-/* 🍰 Recipe Card Row */
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun RecipeRow(
-    recipe: Recipe,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    onLongClick: () -> Unit
-) {
+fun RecipeRow(recipe: Recipe, isSelected: Boolean, onClick: () -> Unit, onLongClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
