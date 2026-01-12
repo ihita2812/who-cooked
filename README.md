@@ -19,6 +19,7 @@ Android app for the recipes of 401.
 - ! test add again
 - ! test delete again
 - data validation (incl empty insertion)
+- refactor: section header vs labeled field
 
 ## UI todo-
 - ~~home screen add their pics~~
