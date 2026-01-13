@@ -32,6 +32,7 @@ class RecipeListViewModel : ViewModel() {
         viewModelScope.launch {
             _selectedRecipeIds.value.forEach { id ->
                 Database.recipeDao.deleteById(id)
+                /* TODO : delete from firebase as well */
             }
             clearSelection()
         }

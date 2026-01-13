@@ -98,7 +98,10 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
                     TextField(
                         value = title,
                         onValueChange = { title = it },
-                        placeholder = { Text("e.g. Lemon Tart") },
+                        placeholder = { Text(
+                            text = "e.g. Lemon Tart",
+                            color = TextMuted
+                        ) },
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                         colors = textFieldColors(),
@@ -158,7 +161,10 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
                     TextField(
                         value = step,
                         onValueChange = { processSteps[index] = it },
-                        placeholder = { Text("Step ${index + 1}") },
+                        placeholder = { Text(
+                            text = "Step ${index + 1}",
+                            color = TextMuted
+                        ) },
                         modifier = Modifier.weight(1f),
                         colors = textFieldColors(),
                         shape = MaterialTheme.shapes.large
@@ -196,7 +202,10 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
                 TextField(
                     value = notes,
                     onValueChange = { notes = it },
-                    placeholder = { Text("Optional notes…") },
+                    placeholder = { Text(
+                        text = "Optional notes…",
+                        color = TextMuted
+                    ) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors(),
                     shape = MaterialTheme.shapes.large,

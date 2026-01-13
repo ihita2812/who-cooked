@@ -17,6 +17,8 @@ Android app for the recipes of 401.
 - ! add "menu" thingy for info screen
 - add dark/light/system mode
 - ! test add again
+- ! test delete again
+- empty insertion, other edge cases
 
 ## UI todo-
 - ~~home screen add their pics~~
@@ -28,4 +30,4 @@ Android app for the recipes of 401.
 - ~~basic border~~
 - fun border
 - ~~buttons iconify~~
-- !! ingredient refactor a/e screen
+- ~~!! ingredient refactor a/e screen~~
