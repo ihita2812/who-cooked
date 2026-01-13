@@ -1,5 +1,6 @@
 package com.ihita.wholetthemcook.ui.screens
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,6 +30,7 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
 
     val scope = rememberCoroutineScope()
 
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
     var title by remember { mutableStateOf("") }
     val ingredients = remember { mutableStateListOf<ExportIngredient>() }
     val processSteps = remember { mutableStateListOf("") }
@@ -73,6 +75,7 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
             verticalArrangement = Arrangement.spacedBy(26.dp)
         ) {
 
+            // header
             item {
                 Text(
                     text = if (recipeId == null) "New Recipe" else "Edit Recipe",
@@ -93,6 +96,16 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
                 )
             }
 
+            // header image
+            item {
+                RecipeImagePicker(
+                    imageUri = imageUri,
+                    onPick = { imageUri = it },
+                    onRemove = { imageUri = null }
+                )
+            }
+
+            // title
             item {
                 LabeledField(label = "RECIPE TITLE") {
                     TextField(
@@ -107,6 +120,7 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
                 }
             }
 
+            // ingredients
             item { SectionHeader(text = "INGREDIENTS") }
 
             item {
@@ -139,6 +153,7 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
                 }
             }
 
+            // process
             item { SectionHeader(text = "PROCESS") }
 
             itemsIndexed(processSteps) { index, step ->
@@ -190,6 +205,7 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
                 }
             }
 
+            // notes
             item { SectionHeader(text = "NOTES") }
 
             item {
@@ -206,6 +222,7 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
 
             item { Spacer(modifier = Modifier.height(12.dp)) }
 
+            // buttons
             item {
                 Button(
                     onClick = {

@@ -5,6 +5,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -75,6 +77,17 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
             verticalArrangement = Arrangement.spacedBy(26.dp)
         ) {
 
+            // header image
+            item {
+                RecipeImageHeader(
+                    imageUri = recipe!!.imageUri,
+                    onClick = {
+                        // optional: fullscreen image viewer
+                    }
+                )
+            }
+
+            // title
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -142,6 +155,7 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
                 }
             }
 
+            // ingredients
             item {
                 Text(
                     text = "INGREDIENTS",
@@ -176,6 +190,7 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
                 }
             }
 
+            // process
             item {
                 Text(
                     text = "PROCESS",
@@ -198,6 +213,19 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
                 }
             }
 
+            // gallery
+            if (!recipe!!.extraImages.isNullOrEmpty()) {
+                item {
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(items = recipe!!.extraImages as List<Any?>) { uri ->
+                            RecipeThumbnail(uri)
+                        }
+                    }
+                }
+            }
+
+
+            // notes
             if (!recipe!!.notes.isNullOrBlank()) {
                 item {
                     Text(

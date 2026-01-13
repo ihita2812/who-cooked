@@ -11,5 +11,7 @@ data class Recipe(
     val dateAdded: Date = Date(),
     val dateOpened: Date = Date(),
     val process: List<String> = emptyList(),
-    val notes: String? = null
+    val notes: String? = null,
+    val imageUri: String? = null,
+    val extraImages: List<String>? = null
 )
