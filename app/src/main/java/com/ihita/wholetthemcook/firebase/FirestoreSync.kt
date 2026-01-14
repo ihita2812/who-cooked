@@ -12,29 +12,35 @@ object FirestoreSync {
 
     private val db = FirebaseFirestore.getInstance()
 
-    fun uploadRecipe(recipe: Recipe) {
+    suspend fun uploadRecipe(recipe: Recipe) {
         db.collection("recipes")
             .document(recipe.id.toString())
             .set(recipe)
+            .await()
     }
 
-    fun uploadIngredient(ingredient: Ingredient) {
+    suspend fun uploadIngredient(ingredient: Ingredient) {
         db.collection("ingredients")
             .document(ingredient.id.toString())
             .set(ingredient)
+            .await()
     }
 
-    fun uploadIngredientSet(set: FirestoreIngredientSet) {
-        db.collection("ingredientSets").add(
-            mapOf(
-                "recipeId" to set.recipeId,
-                "ingredientId" to set.ingredientId,
-                "quantity" to set.quantity,
-                "unit" to set.unit,
-                "notes" to set.notes
+    suspend fun uploadIngredientSet(set: FirestoreIngredientSet) {
+        db.collection("ingredientSets")
+            .document("${set.recipeId}_${set.ingredientId}")
+            .set(
+                mapOf(
+                    "recipeId" to set.recipeId,
+                    "ingredientId" to set.ingredientId,
+                    "quantity" to set.quantity,
+                    "unit" to set.unit,
+                    "notes" to set.notes
+                )
             )
-        )
+            .await()
     }
+
 
     suspend fun deleteIngredientSetsForRecipe(recipeId: Long) {
         val snapshot = db.collection("ingredientSets")
@@ -42,10 +48,23 @@ object FirestoreSync {
             .get()
             .await()
 
-        snapshot.documents.forEach {
-            it.reference.delete().await()
+        if (snapshot.isEmpty) return
+
+        val batch = db.batch()
+        snapshot.documents.forEach { doc ->
+            batch.delete(doc.reference)
         }
+
+        batch.commit().await()
+
     }
 
+
+    suspend fun deleteRecipe(recipeId: Long) {
+        db.collection("recipes")
+            .document(recipeId.toString())
+            .delete()
+            .await()
+    }
 
 }

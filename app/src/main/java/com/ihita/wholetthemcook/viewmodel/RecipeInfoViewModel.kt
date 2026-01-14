@@ -7,6 +7,7 @@ import com.ihita.wholetthemcook.data.ExportIngredient
 import com.ihita.wholetthemcook.data.ExportRecipe
 import com.ihita.wholetthemcook.data.IngredientRecipe
 import com.ihita.wholetthemcook.data.Recipe
+import com.ihita.wholetthemcook.data.RecipeRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -20,8 +21,12 @@ class RecipeInfoViewModel(private val recipeId: Long) : ViewModel() {
 
     fun deleteRecipe() {
         viewModelScope.launch {
-            Database.recipeDao.deleteById(recipeId)
-            _isDeleted.value = true
+            try {
+                RecipeRepository.deleteRecipe(recipeId)
+            } finally {
+                Database.recipeDao.deleteById(recipeId)
+                _isDeleted.value = true
+            }
         }
     }
 

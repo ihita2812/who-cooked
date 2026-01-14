@@ -54,20 +54,13 @@ object RecipeRepository {
                 )
             }
 
-//        Database.getDb().runInTransaction {
-//            Database.ingredientSetDao.deleteForRecipe(recipe.id)
-//            Database.ingredientSetDao.insertAll(ingredientSets)
-//        }
-
         Database.recipeTransactionDao.replaceIngredientsForRecipe(recipe.id, ingredientSets)
 
         FirestoreSync.deleteIngredientSetsForRecipe(recipe.id)
         ingredientSets.forEach { set ->
-//            FirestoreSync.uploadIngredientSet(set)
             try {
                 FirestoreSync.uploadIngredientSet(
                     FirestoreIngredientSet(
-//                        id = set.id,
                         recipeId = set.recipeId,
                         ingredientId = set.ingredientId,
                         quantity = set.quantity,
@@ -76,12 +69,20 @@ object RecipeRepository {
                     )
                 )
             } catch (e: Exception) {
-                println("Error while firestore pushing ingredientset.")
-                println("${e}")
+                println("Error while firestore pushing ingredient set.")
+                println("$e")
                 println("-------------------------------------------")
-                println("recipeid: ${set.recipeId}, ingredientid: ${set.ingredientId}")
+                println("recipe id: ${set.recipeId}, ingredient id: ${set.ingredientId}")
                 println("-------------------------------------------")
             }
         }
     }
+
+    suspend fun deleteRecipe(recipeId: Long) {
+        Database.recipeDao.deleteById(recipeId)
+
+        FirestoreSync.deleteIngredientSetsForRecipe(recipeId)
+        FirestoreSync.deleteRecipe(recipeId)
+    }
+
 }
