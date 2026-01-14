@@ -1,11 +1,15 @@
 package com.ihita.wholetthemcook.ui.export
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
-import com.ihita.wholetthemcook.data.ExportRecipe
+import androidx.core.content.res.ResourcesCompat
+import com.ihita.wholetthemcook.R
 import java.io.OutputStream
+
+import com.ihita.wholetthemcook.data.ExportRecipe
 
 /**
  * Data models used ONLY for export (decoupled from Room)
@@ -28,28 +32,46 @@ import java.io.OutputStream
 /**
  * PDF Exporter
  */
+
 object RecipePdfExporter {
 
-    fun export(recipes: List<ExportRecipe>, outputStream: OutputStream) {
+    private val DARK_PURPLE = Color.parseColor("#5B3E85")
+    private val LIGHTER_PURPLE = Color.parseColor("#7D5BA6")
+    private val TEXT_BODY = Color.parseColor("#4B3A61")
+    private val DIVIDER_PURPLE = Color.parseColor("#D6C9FF")
+
+    fun export(context: Context, recipes: List<ExportRecipe>, outputStream: OutputStream) {
+
         val document = PdfDocument()
 
+        val titleFont = ResourcesCompat.getFont(context, R.font.playfairdisplay_extrabold) ?: Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        val sectionFont = ResourcesCompat.getFont(context, R.font.raleway_medium) ?: Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        val bodyFont = ResourcesCompat.getFont(context, R.font.nunito_regular) ?: Typeface.DEFAULT
+
         val titlePaint = Paint().apply {
-            textSize = 20f
-            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            color = Color.BLACK
+            textSize = 22f
+            typeface = titleFont
+            color = DARK_PURPLE
             isAntiAlias = true
         }
 
-        val headerPaint = Paint().apply {
-            textSize = 16f
-            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            color = Color.DKGRAY
+        val sectionPaint = Paint().apply {
+            textSize = 13.5f
+            typeface = sectionFont
+            color = LIGHTER_PURPLE
             isAntiAlias = true
+            letterSpacing = 0.1f
         }
 
         val bodyPaint = Paint().apply {
             textSize = 14f
-            color = Color.BLACK
+            typeface = bodyFont
+            color = TEXT_BODY
+            isAntiAlias = true
+        }
+
+        val accentPaint = Paint().apply {
+            color = DIVIDER_PURPLE
             isAntiAlias = true
         }
 
@@ -63,56 +85,72 @@ object RecipePdfExporter {
             val page = document.startPage(pageInfo)
             val canvas = page.canvas
 
-            var y = 40f
+            var y = 48f
+            val marginStart = 40f
 
-            // Title
-            canvas.drawText(recipe.title, 40f, y, titlePaint)
-            y += 32f
+            canvas.drawText(recipe.title, marginStart, y, titlePaint)
+            y += 20f
 
-            // Ingredients
-            canvas.drawText("Ingredients", 40f, y, headerPaint)
+            canvas.drawRoundRect(
+                marginStart,
+                y,
+                marginStart + 72f,
+                y + 3f,
+                4f,
+                4f,
+                accentPaint
+            )
+
+            y += 36f
+
+            canvas.drawText("INGREDIENTS", marginStart, y, sectionPaint)
             y += 22f
 
             recipe.ingredients.forEach { ingredient ->
-                val line = buildString {
-                    append("• ${ingredient.name}")
+                canvas.drawText("•", marginStart, y, bodyPaint)
+
+                val ing = buildString {
+                    append(ingredient.name)
                     ingredient.quantity?.let { q ->
-                        append(" – $q")
-                        ingredient.unit?.let { u -> append(" $u") }
+                        append(" – ")
+                        append(q)
+                        ingredient.unit?.let { unit ->
+                            append(" $unit")
+                        }
                     }
-                    if (ingredient.notes != null && ingredient.notes != "") {
-                        append(" (${ingredient.notes})")
-                    }
+                    ingredient.notes
+                        ?.takeIf { it.isNotBlank() }
+                        ?.let { note ->
+                            append(" ($note)")
+                        }
                 }
 
-                canvas.drawText(line, 50f, y, bodyPaint)
-                y += 18f
+                canvas.drawText(ing, marginStart + 15f, y, bodyPaint)
+                y += 20f
             }
 
-            y += 16f
+            y += 14f
 
-            // Process
-            canvas.drawText("Process", 40f, y, headerPaint)
+            canvas.drawText("PROCESS", marginStart, y, sectionPaint)
             y += 22f
 
             recipe.process.forEachIndexed { index, step ->
-                canvas.drawText(
-                    "${index + 1}. $step",
-                    50f,
-                    y,
-                    bodyPaint
-                )
-                y += 18f
+                canvas.drawText("${index + 1}.", marginStart, y, Paint(bodyPaint).apply {
+                    typeface = titleFont
+                })
+
+                canvas.drawText(step, marginStart + 24f, y, bodyPaint)
+
+                y += 22f
             }
 
-            // Notes
             recipe.notes
                 ?.takeIf { it.isNotBlank() }
                 ?.let { notes ->
-                    y += 16f
-                    canvas.drawText("Notes", 40f, y, headerPaint)
+                    y += 14f
+                    canvas.drawText("NOTES", marginStart, y, sectionPaint)
                     y += 22f
-                    canvas.drawText(notes, 50f, y, bodyPaint)
+                    canvas.drawText(notes, marginStart, y, bodyPaint)
                 }
 
             document.finishPage(page)

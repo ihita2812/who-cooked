@@ -53,6 +53,7 @@ fun RecipeListScreen(navController: NavController) {
                 scope.launch {
                     context.contentResolver.openOutputStream(it)?.use { out ->
                         RecipePdfExporter.export(
+                            context,
                             listViewModel.getSelectedExportRecipes(),
                             out
                         )
