@@ -38,3 +38,10 @@ captures/
 # Kotlin / KAPT
 # ======================
 kaptGenerated/
+
+# ======================
+# Releases
+# ======================
+app/keystore/*.jks
+app/signing.properties
+app/release/
