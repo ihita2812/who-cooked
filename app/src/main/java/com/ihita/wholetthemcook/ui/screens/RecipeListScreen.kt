@@ -142,7 +142,7 @@ fun RecipeListScreen(navController: NavController) {
             },
             text = {
                 Text(
-                    text = "Delete ${selectedIds.size} recipe(s)?",
+                    text = "Are you sure you want to delete ${selectedIds.size} recipe(s)?",
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextBody
                 )
@@ -155,7 +155,7 @@ fun RecipeListScreen(navController: NavController) {
                     Text(
                         text = "Delete",
                         style = MaterialTheme.typography.labelSmall,
-                        color = DarkPurple
+                        color = MaterialTheme.colorScheme.error
                     )
                 }
             },
@@ -164,7 +164,7 @@ fun RecipeListScreen(navController: NavController) {
                     Text(
                         text = "Cancel",
                         style = MaterialTheme.typography.labelSmall,
-                        color = LighterPurple
+                        color = TextBody
                     )
                 }
             }

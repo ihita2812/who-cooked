@@ -218,6 +218,7 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
     if (showDeleteDialog) {
         val recipeTitle = recipe?.title ?: ""
         AlertDialog(
+            containerColor = LightLilac,
             onDismissRequest = { showDeleteDialog = false },
             title = { Text("Delete recipe?", style = MaterialTheme.typography.titleMedium, color = DarkPurple) },
             text = { Text("Are you sure you want to delete \"$recipeTitle\"?", style = MaterialTheme.typography.bodyMedium, color = TextBody) },

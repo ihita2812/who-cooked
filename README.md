@@ -16,8 +16,8 @@ Android app for the recipes of 401.
 - !! design copy to export as pdf
 - add "menu" thingy for info screen
 - add dark/light/system mode
-- !!! test add again
-- !!! test delete again
+- ~~!!! test add again~~
+- ~~!!! test delete again~~
 - ~~!!! data validation (incl empty insertion)~~
 - ! refactor: section header vs labeled field
 
