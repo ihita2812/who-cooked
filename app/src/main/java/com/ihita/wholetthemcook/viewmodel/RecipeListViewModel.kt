@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import com.ihita.wholetthemcook.data.Database
 import com.ihita.wholetthemcook.data.ExportRecipe
 import com.ihita.wholetthemcook.data.Recipe
+import com.ihita.wholetthemcook.data.RecipeRepository
 import com.ihita.wholetthemcook.ui.components.SortOption
 
 class RecipeListViewModel : ViewModel() {
@@ -32,7 +33,7 @@ class RecipeListViewModel : ViewModel() {
         viewModelScope.launch {
             _selectedRecipeIds.value.forEach { id ->
                 Database.recipeDao.deleteById(id)
-                /* TODO : delete from firebase as well */
+                RecipeRepository.deleteRecipe(id)
             }
             clearSelection()
         }

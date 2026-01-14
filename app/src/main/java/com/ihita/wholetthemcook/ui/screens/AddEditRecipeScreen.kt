@@ -143,7 +143,22 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
                                 if (ingredients.size > 1) {
                                     ingredients.remove(ingredient)
                                 }
-                            }
+                            },
+//                            onDelete = {
+//                                val removed = ingredient
+//                                ingredients.remove(ingredient)
+//
+//                                scope.launch {
+//                                    snackbarHostState.showSnackbar(
+//                                        message = "${removed.name} removed",
+//                                        actionLabel = "Undo"
+//                                    ).let { result ->
+//                                        if (result == SnackbarResult.ActionPerformed) {
+//                                            ingredients.add(removed)
+//                                        }
+//                                    }
+//                                }
+//                            }
                         )
                     }
                 }
@@ -257,7 +272,6 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
                                             ?.trim()
                                             ?.toFloatOrNull()
 
-                                        // Drop ingredients with no meaningful data
                                         if (
                                             ing.name.isBlank() &&
                                             qty == null &&
@@ -309,8 +323,6 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
         }
     }
 }
-
-/* ---------- helpers ---------- */
 
 @Composable
 private fun SectionHeader(text: String) {

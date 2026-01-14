@@ -39,6 +39,10 @@ interface IngredientSetDao {
 //    @Upsert
     suspend fun insertOrUpdate(set: IngredientSet)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdateAll(sets: List<IngredientSet>)
+
     @Query("DELETE FROM IngredientSet WHERE recipeId = :recipeId AND ingredientId = :ingredientId")
     suspend fun deleteByRecipeAndIngredient(recipeId: Long, ingredientId: Long)
+
 }

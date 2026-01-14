@@ -29,7 +29,10 @@ import com.ihita.wholetthemcook.ui.theme.*
 @Composable
 fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
 
-    val infoViewModel: RecipeInfoViewModel = viewModel(factory = RecipeInfoViewModelFactory(recipeId))
+    val infoViewModel: RecipeInfoViewModel = viewModel(
+        key = "RecipeInfo-$recipeId",
+        factory = RecipeInfoViewModelFactory(recipeId)
+    )
 
     val recipe by infoViewModel.recipe.collectAsState()
     val ingredients by infoViewModel.ingredients.collectAsState()
@@ -54,19 +57,27 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
 
     PaperScreen {
 
-        if (recipe == null) {
+        if (recipe == null || isDeleted) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Loading…",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = TextBody
-                )
+                if (isDeleted) {
+                    CircularProgressIndicator() // optional, app is navigating back
+                } else {
+                    Text(
+                        text = "Loading…",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextBody
+                    )
+                }
             }
             return@PaperScreen
         }
+
+        val recipeTitle = recipe?.title ?: ""
+        val recipeProcess = recipe?.process
+        val recipeNotes = recipe?.notes
 
         LazyColumn(
             modifier = Modifier
@@ -75,16 +86,14 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
             contentPadding = PaddingValues(vertical = 28.dp),
             verticalArrangement = Arrangement.spacedBy(26.dp)
         ) {
-
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.Top
                 ) {
-
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = recipe!!.title,
+                            text = recipeTitle,
                             style = MaterialTheme.typography.titleMedium,
                             color = DarkPurple
                         )
@@ -103,38 +112,25 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
                     }
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
-
-                        IconButton(
-                            onClick = {
-                                navController.navigate(
-                                    "${Routes.ROUTE_EDIT_RECIPE}/$recipeId"
-                                )
-                            }
-                        ) {
+                        IconButton(onClick = { navController.navigate("${Routes.ROUTE_EDIT_RECIPE}/$recipeId") }) {
                             Icon(
-                                imageVector = Icons.Default.Edit,
+                                Icons.Default.Edit,
                                 contentDescription = "Edit recipe",
                                 tint = TextBody
                             )
                         }
 
-                        IconButton(
-                            onClick = {
-                                exportLauncher.launch("${recipe!!.title}.pdf")
-                            }
-                        ) {
+                        IconButton(onClick = { exportLauncher.launch("$recipeTitle.pdf") }) {
                             Icon(
-                                imageVector = Icons.Default.Share,
+                                Icons.Default.Share,
                                 contentDescription = "Export recipe",
                                 tint = TextBody
                             )
                         }
 
-                        IconButton(
-                            onClick = { showDeleteDialog = true }
-                        ) {
+                        IconButton(onClick = { showDeleteDialog = true }) {
                             Icon(
-                                imageVector = Icons.Default.Delete,
+                                Icons.Default.Delete,
                                 contentDescription = "Delete recipe",
                                 tint = TextBody
                             )
@@ -145,29 +141,29 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
 
             item {
                 Text(
-                    text = "INGREDIENTS",
+                    "INGREDIENTS",
                     style = MaterialTheme.typography.labelLarge,
                     color = LighterPurple
                 )
             }
 
             item {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     ingredients.forEach { item ->
                         Text(
                             text = buildString {
-                                append("• ")
-                                append(item.ingredient.title)
+                                append("• ${item.ingredient.title}")
                                 item.ingredientSet.quantity?.let {
-                                    append(" – ${QuantityFormatter.format(it)}")
-                                    item.ingredientSet.unit?.let { unit ->
-                                        append(" $unit")
-                                    }
+                                    append(
+                                        " – ${
+                                            QuantityFormatter.format(
+                                                it
+                                            )
+                                        }"
+                                    )
                                 }
-                                item.ingredientSet.notes
-                                    ?.takeIf { it.isNotBlank() }
+                                item.ingredientSet.unit?.let { append(" $it") }
+                                item.ingredientSet.notes?.takeIf { it.isNotBlank() }
                                     ?.let { append(" ($it)") }
                             },
                             style = MaterialTheme.typography.bodyMedium,
@@ -179,19 +175,17 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
 
             item {
                 Text(
-                    text = "PROCESS",
+                    "PROCESS",
                     style = MaterialTheme.typography.labelLarge,
                     color = LighterPurple
                 )
             }
 
             item {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    recipe!!.process.forEachIndexed { index, step ->
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    recipeProcess?.forEachIndexed { index, step ->
                         Text(
-                            text = "${index + 1}. $step",
+                            "${index + 1}. $step",
                             style = MaterialTheme.typography.bodyMedium,
                             color = TextBody
                         )
@@ -199,10 +193,10 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
                 }
             }
 
-            if (!recipe!!.notes.isNullOrBlank()) {
+            if (!recipeNotes.isNullOrBlank()) {
                 item {
                     Text(
-                        text = "NOTES",
+                        "NOTES",
                         style = MaterialTheme.typography.labelLarge,
                         color = LighterPurple
                     )
@@ -210,7 +204,7 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
 
                 item {
                     Text(
-                        text = recipe!!.notes!!,
+                        recipe!!.notes!!,
                         style = MaterialTheme.typography.bodyMedium,
                         color = TextBody
                     )
@@ -222,41 +216,23 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
     }
 
     if (showDeleteDialog) {
+        val recipeTitle = recipe?.title ?: ""
         AlertDialog(
+            containerColor = LightLilac,
             onDismissRequest = { showDeleteDialog = false },
-            title = {
-                Text(
-                    text = "Delete recipe?",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = DarkPurple
-                )
-            },
-            text = {
-                Text(
-                    text = "Are you sure you want to delete \"${recipe!!.title}\"?",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = TextBody
-                )
-            },
+            title = { Text("Delete recipe?", style = MaterialTheme.typography.titleMedium, color = DarkPurple) },
+            text = { Text("Are you sure you want to delete \"$recipeTitle\"?", style = MaterialTheme.typography.bodyMedium, color = TextBody) },
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteDialog = false
                     infoViewModel.deleteRecipe()
                 }) {
-                    Text(
-                        text = "Delete",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.error
-                    )
+                    Text("Delete", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text(
-                        text = "Cancel",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = TextBody
-                    )
+                    Text("Cancel", style = MaterialTheme.typography.labelSmall, color = TextBody)
                 }
             }
         )
