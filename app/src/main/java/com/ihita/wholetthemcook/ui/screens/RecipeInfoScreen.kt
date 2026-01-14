@@ -45,7 +45,7 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
         uri?.let {
             context.contentResolver.openOutputStream(it)?.use { out ->
                 infoViewModel.getExportRecipe()?.let { recipe ->
-                    RecipePdfExporter.export(listOf(recipe), out)
+                    RecipePdfExporter.export(context, listOf(recipe), out)
                 }
             }
         }
