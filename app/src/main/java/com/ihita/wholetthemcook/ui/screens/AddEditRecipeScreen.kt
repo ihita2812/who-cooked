@@ -30,6 +30,7 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
     val scope = rememberCoroutineScope()
 
     var title by remember { mutableStateOf("") }
+    var titleError by remember { mutableStateOf(false) }
     val ingredients = remember { mutableStateListOf<ExportIngredient>() }
     val processSteps = remember { mutableStateListOf("") }
     var notes by remember { mutableStateOf("") }
@@ -38,23 +39,23 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
         if (recipeId != null) {
             val recipe = Database.recipeDao.getRecipeById(recipeId)
             title = recipe.title
+            notes = recipe.notes.orEmpty()
+
             processSteps.clear()
             processSteps.addAll(recipe.process.ifEmpty { listOf("") })
-            notes = recipe.notes ?: ""
-
-            val ingredientRecipes =
-                Database.ingredientSetDao.getIngredientsForRecipe(recipeId)
 
             ingredients.clear()
             ingredients.addAll(
-                ingredientRecipes.map {
-                    ExportIngredient(
-                        name = it.ingredient.title,
-                        quantity = it.ingredientSet.quantity?.toString() ?: "",
-                        unit = it.ingredientSet.unit ?: "",
-                        notes = it.ingredientSet.notes ?: ""
-                    )
-                }
+                Database.ingredientSetDao
+                    .getIngredientsForRecipe(recipeId)
+                    .map {
+                        ExportIngredient(
+                            name = it.ingredient.title,
+                            quantity = it.ingredientSet.quantity?.toString(),
+                            unit = it.ingredientSet.unit,
+                            notes = it.ingredientSet.notes
+                        )
+                    }
             )
 
             if (ingredients.isEmpty()) ingredients.add(ExportIngredient())
@@ -62,6 +63,8 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
             ingredients.add(ExportIngredient())
         }
     }
+
+    val isSaveEnabled = title.trim().isNotEmpty()
 
     PaperScreen {
 
@@ -97,16 +100,30 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
                 LabeledField(label = "RECIPE TITLE") {
                     TextField(
                         value = title,
-                        onValueChange = { title = it },
-                        placeholder = { Text(
-                            text = "e.g. Lemon Tart",
-                            color = TextMuted
-                        ) },
+                        onValueChange = {
+                            title = it
+                            titleError = false
+                        },
+                        isError = titleError,
+                        placeholder = {
+                            Text(
+                                text = "e.g. Lemon Tart",
+                                color = TextMuted
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                         colors = textFieldColors(),
                         shape = MaterialTheme.shapes.large
                     )
+
+                    if (titleError) {
+                        Text(
+                            text = "Recipe title is required",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
                 }
             }
 
@@ -161,10 +178,12 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
                     TextField(
                         value = step,
                         onValueChange = { processSteps[index] = it },
-                        placeholder = { Text(
-                            text = "Step ${index + 1}",
-                            color = TextMuted
-                        ) },
+                        placeholder = {
+                            Text(
+                                text = "Step ${index + 1}",
+                                color = TextMuted
+                            )
+                        },
                         modifier = Modifier.weight(1f),
                         colors = textFieldColors(),
                         shape = MaterialTheme.shapes.large
@@ -202,10 +221,12 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
                 TextField(
                     value = notes,
                     onValueChange = { notes = it },
-                    placeholder = { Text(
-                        text = "Optional notes…",
-                        color = TextMuted
-                    ) },
+                    placeholder = {
+                        Text(
+                            text = "Optional notes…",
+                            color = TextMuted
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors(),
                     shape = MaterialTheme.shapes.large,
@@ -213,33 +234,55 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
                 )
             }
 
-            item { Spacer(modifier = Modifier.height(12.dp)) }
-
             item {
                 Button(
                     onClick = {
+                        val trimmedTitle = title.trim()
+                        if (trimmedTitle.isEmpty()) {
+                            titleError = true
+                            return@Button
+                        }
+
                         scope.launch {
                             RecipeRepository.saveRecipeWithIngredients(
-                                recipeId,
-                                title.trim(),
-                                processSteps.map { it.trim() }
+                                recipeId = recipeId,
+                                title = trimmedTitle,
+                                process = processSteps
+                                    .map { it.trim() }
                                     .filter { it.isNotEmpty() },
-                                notes.trim(),
-                                ingredients.map {
-                                    ExportIngredient(
-                                        name = it.name.trim(),
-                                        quantity = it.quantity?.trim(),
-                                        unit = it.unit?.trim(),
-                                        notes = it.notes?.trim()
-                                    )
-                                }
+                                notes = notes.trim(),
+                                ingredients = ingredients
+                                    .mapNotNull { ing ->
+                                        val qty = ing.quantity
+                                            ?.trim()
+                                            ?.toFloatOrNull()
+
+                                        // Drop ingredients with no meaningful data
+                                        if (
+                                            ing.name.isBlank() &&
+                                            qty == null &&
+                                            ing.unit.isNullOrBlank() &&
+                                            ing.notes.isNullOrBlank()
+                                        ) {
+                                            null
+                                        } else {
+                                            ExportIngredient(
+                                                name = ing.name.trim(),
+                                                quantity = qty?.toString(),
+                                                unit = ing.unit?.trim(),
+                                                notes = ing.notes?.trim()
+                                            )
+                                        }
+                                    }
                             )
                             navController.popBackStack()
                         }
                     },
+                    enabled = isSaveEnabled,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = ButtonPrimary
+                        containerColor = ButtonPrimary,
+                        disabledContainerColor = ButtonPrimary.copy(alpha = 0.4f)
                     ),
                     shape = MaterialTheme.shapes.large
                 ) {
@@ -267,6 +310,8 @@ fun AddEditRecipeScreen(navController: NavController, recipeId: Long? = null) {
     }
 }
 
+/* ---------- helpers ---------- */
+
 @Composable
 private fun SectionHeader(text: String) {
     Text(
@@ -277,7 +322,10 @@ private fun SectionHeader(text: String) {
 }
 
 @Composable
-private fun LabeledField(label: String, content: @Composable () -> Unit) {
+private fun LabeledField(
+    label: String,
+    content: @Composable () -> Unit
+) {
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(
             text = label,

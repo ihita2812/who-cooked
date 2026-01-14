@@ -12,14 +12,14 @@ Android app for the recipes of 401.
 - favourites
 - ~~process should be a list~~
 - add proper icons
-- !!! images section
-- !!! design copy to export as pdf
-- ! add "menu" thingy for info screen
+- !! images section
+- !! design copy to export as pdf
+- add "menu" thingy for info screen
 - add dark/light/system mode
-- ! test add again
-- ! test delete again
-- data validation (incl empty insertion)
-- refactor: section header vs labeled field
+- !!! test add again
+- !!! test delete again
+- ~~!!! data validation (incl empty insertion)~~
+- ! refactor: section header vs labeled field
 
 ## UI todo-
 - ~~home screen add their pics~~
