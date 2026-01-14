@@ -75,9 +75,7 @@ fun IngredientRow(ingredient: ExportIngredient, onChange: (ExportIngredient) -> 
                         .weight(0.8f)
                         .height(fieldHeight),
                     singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number
-                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     colors = ingredientFieldColors(),
                     shape = MaterialTheme.shapes.large,
 //                    shape = RoundedCornerShape(

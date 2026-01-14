@@ -21,6 +21,7 @@ import androidx.navigation.NavController
 import com.ihita.wholetthemcook.navigation.Routes
 import com.ihita.wholetthemcook.ui.components.PaperScreen
 import com.ihita.wholetthemcook.ui.export.RecipePdfExporter
+import com.ihita.wholetthemcook.ui.export.QuantityFormatter
 import com.ihita.wholetthemcook.viewmodel.RecipeInfoViewModel
 import com.ihita.wholetthemcook.viewmodel.RecipeInfoViewModelFactory
 import com.ihita.wholetthemcook.ui.theme.*
@@ -160,7 +161,7 @@ fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
                                 append("• ")
                                 append(item.ingredient.title)
                                 item.ingredientSet.quantity?.let {
-                                    append(" – $it")
+                                    append(" – ${QuantityFormatter.format(it)}")
                                     item.ingredientSet.unit?.let { unit ->
                                         append(" $unit")
                                     }

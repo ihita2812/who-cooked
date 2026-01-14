@@ -11,7 +11,7 @@ import com.ihita.wholetthemcook.ui.screens.*
 fun WhoLetThemCookNavGraph() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "home") {
+    NavHost(navController = navController, startDestination = Routes.HOME) {
         composable(Routes.HOME) {
             HomeScreen(navController)
         }

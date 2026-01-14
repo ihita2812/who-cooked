@@ -6,7 +6,7 @@ Android app for the recipes of 401.
 - ~~ingredients formatting to recipe-info-screen~~
 - ~~ingredients formatting to recipe-add-edit-screen~~
 - ~~testing ingredient delete~~
-- !! ingredients quant float to int
+- ~~!! ingredients quant float to int~~
 - ~~ingredients efit formatting~~
 - ~~export as pdf~~
 - favourites
@@ -18,7 +18,7 @@ Android app for the recipes of 401.
 - add dark/light/system mode
 - ! test add again
 - ! test delete again
-- empty insertion, other edge cases
+- data validation (incl empty insertion)
 
 ## UI todo-
 - ~~home screen add their pics~~
