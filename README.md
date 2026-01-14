@@ -6,7 +6,7 @@ Android app for the recipes of 401.
 - ~~ingredients formatting to recipe-info-screen~~
 - ~~ingredients formatting to recipe-add-edit-screen~~
 - ~~testing ingredient delete~~
-- !! ingredients quant float to int
+- ~~!! ingredients quant float to int~~
 - ~~ingredients efit formatting~~
 - ~~export as pdf~~
 - favourites
@@ -17,6 +17,8 @@ Android app for the recipes of 401.
 - ! add "menu" thingy for info screen
 - add dark/light/system mode
 - ! test add again
+- ! test delete again
+- data validation (incl empty insertion)
 
 ## UI todo-
 - ~~home screen add their pics~~
@@ -28,4 +30,4 @@ Android app for the recipes of 401.
 - ~~basic border~~
 - fun border
 - ~~buttons iconify~~
-- !! ingredient refactor a/e screen
+- ~~!! ingredient refactor a/e screen~~
