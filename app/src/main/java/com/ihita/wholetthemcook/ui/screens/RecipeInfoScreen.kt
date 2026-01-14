@@ -29,7 +29,10 @@ import com.ihita.wholetthemcook.ui.theme.*
 @Composable
 fun RecipeInfoScreen(navController: NavController, recipeId: Long) {
 
-    val infoViewModel: RecipeInfoViewModel = viewModel(factory = RecipeInfoViewModelFactory(recipeId))
+    val infoViewModel: RecipeInfoViewModel = viewModel(
+        key = "RecipeInfo-$recipeId",
+        factory = RecipeInfoViewModelFactory(recipeId)
+    )
 
     val recipe by infoViewModel.recipe.collectAsState()
     val ingredients by infoViewModel.ingredients.collectAsState()

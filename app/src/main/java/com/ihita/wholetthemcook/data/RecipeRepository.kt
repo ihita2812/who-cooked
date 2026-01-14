@@ -1,6 +1,7 @@
 package com.ihita.wholetthemcook.data
 
 import java.util.Date
+
 import com.ihita.wholetthemcook.firebase.FirestoreSync
 import com.ihita.wholetthemcook.firebase.model.FirestoreIngredientSet
 
@@ -58,7 +59,7 @@ object RecipeRepository {
 //            Database.ingredientSetDao.insertAll(ingredientSets)
 //        }
 
-        Database.recipeTransactionDao.replaceIngredientsForRecipe(recipe, ingredientSets)
+        Database.recipeTransactionDao.replaceIngredientsForRecipe(recipe.id, ingredientSets)
 
         FirestoreSync.deleteIngredientSetsForRecipe(recipe.id)
         ingredientSets.forEach { set ->
@@ -66,7 +67,7 @@ object RecipeRepository {
             try {
                 FirestoreSync.uploadIngredientSet(
                     FirestoreIngredientSet(
-                        id = set.id,
+//                        id = set.id,
                         recipeId = set.recipeId,
                         ingredientId = set.ingredientId,
                         quantity = set.quantity,
